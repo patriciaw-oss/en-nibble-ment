@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoodFinder PJ</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --g:#00B14F;--gd:#007a36;--gl:#e6f7ee;
+      --bg:#f0f2f5;--w:#fff;--border:#e0e6ed;
+      --text:#1a1a2e;--mid:#556;--light:#9aa;
+      --shadow:0 4px 24px rgba(0,0,0,.09);--r:18px;
+      --grab-orange:#ff5200;
+    }
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);height:100vh;display:flex;align-items:center;justify-content:center}
+    .app{width:450px;max-width:100vw;height:94vh;max-height:880px;background:var(--w);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+
+    /* ── Header ── */
+    .hdr{background:linear-gradient(135deg,#00B14F 0%,#007a36 100%);padding:14px 18px;display:flex;align-items:center;gap:11px;flex-shrink:0}
+    .hdr-av{width:44px;height:44px;background:rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .hdr-info h1{color:#fff;font-size:15px;font-weight:700}
+    .hdr-info p{color:rgba(255,255,255,.75);font-size:11px;margin-top:2px}
+    .hdr-r{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+    .hbadge{background:rgba(255,255,255,.18);color:#fff;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px}
+    .hpeak{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+    .hpeak.red{background:rgba(220,50,50,.3);color:#ffaaaa}
+    .hpeak.yellow{background:rgba(255,200,0,.25);color:#ffe066}
+    .hpeak.green{background:rgba(100,255,150,.2);color:#aaffcc}
+
+    /* ── Chat ── */
+    .chat{flex:1;overflow-y:auto;padding:16px 13px;display:flex;flex-direction:column;gap:9px;scroll-behavior:smooth}
+    .chat::-webkit-scrollbar{width:3px}
+    .chat::-webkit-scrollbar-thumb{background:#dde;border-radius:3px}
+
+    /* ── Messages ── */
+    .row{display:flex;align-items:flex-end;gap:7px;animation:fu .2s ease}
+    .row.user{flex-direction:row-reverse}
+    @keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .bicon{width:27px;height:27px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+    .bub{max-width:80%;padding:10px 13px;border-radius:var(--r);font-size:13.5px;line-height:1.55;color:var(--text)}
+    .bub.bot{background:var(--w);border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+    .bub.user{background:var(--g);color:#fff;border-bottom-right-radius:4px}
+    .bub.grab-bub{background:#fff5f0;border:1.5px solid #ff5200;border-bottom-left-radius:4px}
+
+    /* ── Typing ── */
+    .typing{display:flex;align-items:flex-end;gap:7px}
+    .tdots{background:var(--w);border:1px solid var(--border);border-bottom-left-radius:4px;padding:10px 14px;border-radius:var(--r);display:flex;gap:5px;align-items:center}
+    .tdots span{width:6px;height:6px;background:#bbc;border-radius:50%;animation:bo 1.2s infinite}
+    .tdots span:nth-child(2){animation-delay:.2s}
+    .tdots span:nth-child(3){animation-delay:.4s}
+    @keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+    /* ── Quick replies ── */
+    .qr{display:flex;flex-wrap:wrap;gap:6px;padding:3px 13px 11px;animation:fu .25s ease}
+    .qb{background:var(--w);border:1.5px solid var(--g);color:var(--g);font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:20px;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .qb:hover{background:var(--g);color:#fff}
+    .qb.grab-qb{border-color:var(--grab-orange);color:var(--grab-orange)}
+    .qb.grab-qb:hover{background:var(--grab-orange);color:#fff}
+
+    /* ── Input ── */
+    .inp-wrap{padding:9px 13px 13px;border-top:1px solid var(--border);display:flex;gap:7px;flex-shrink:0}
+    .inp-wrap input{flex:1;border:1.5px solid var(--border);border-radius:22px;padding:9px 15px;font-size:13.5px;outline:none;color:var(--text);transition:border .2s}
+    .inp-wrap input:focus{border-color:var(--g)}
+    .inp-wrap input::placeholder{color:var(--light)}
+    .sbtn{width:40px;height:40px;background:var(--g);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+    .sbtn:hover{background:var(--gd)}
+    .sbtn svg{fill:#fff}
+
+    /* ── Restaurant Card ── */
+    .rc{background:var(--w);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-top:5px;transition:box-shadow .2s,border-color .2s}
+    .rc:hover{box-shadow:0 4px 16px rgba(0,177,79,.13);border-color:var(--g)}
+    .rc.grab-card{border-color:#ff5200}
+    .rc-head{background:var(--gl);padding:9px 12px;display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+    .rc-head.dinner-head{background:#f0f0ff}
+    .rc-head.grab-head{background:#fff5f0}
+    .rc-name{font-weight:700;font-size:13.5px;color:var(--text);line-height:1.3}
+    .rc-r{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+    .rc-price{font-weight:700;font-size:12px;color:var(--gd)}
+    .rc-rating{font-size:12px;font-weight:700;color:#e67e00}
+    .rc-body{padding:9px 12px}
+    .rc-meta{font-size:11.5px;color:var(--mid);margin-bottom:4px}
+    .rc-desc{font-size:12.5px;color:var(--text);line-height:1.5}
+    .rc-deal{font-size:11.5px;color:#c0580a;margin-top:3px;font-weight:600}
+    .rc-pt{font-size:11px;margin-top:4px;font-weight:600;background:#f3e5f5;padding:3px 7px;border-radius:5px;display:inline-block;color:#7b1fa2}
+    .rc-pt.warn{background:#fdecea;color:#b71c1c}
+    .pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+    .pl{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:20px}
+    .pl.walk{background:#e8f5e9;color:#2e7d32}
+    .pl.drive{background:#e3f2fd;color:#1565c0}
+    .pl.t{background:#fff3e0;color:#e65100}
+    .pl.vb{background:#f3e5f5;color:#7b1fa2}
+    .pl.h{background:#e3f2fd;color:#1565c0}
+    .pl.gr{background:#e6f7ee;color:#00803a}
+    .pl.gp{background:#fce4ec;color:#c62828}
+    .pl.dl{background:#fffde7;color:#f57f17}
+    .pl.ar{background:#f0f4ff;color:#3949ab}
+
+    /* ── Social badges ── */
+    .socrow{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
+    .sb{font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px}
+    .sb.tiktok{background:#000;color:#fff}
+    .sb.instagram{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff}
+    .sb.xhs{background:#ff2442;color:#fff}
+    .sb.klfoodie{background:#ff6b00;color:#fff}
+
+    /* ── Grab delivery card ── */
+    .grab-delivery-box{background:#fff8f5;border:2px solid #ff5200;border-radius:14px;padding:14px;margin-top:6px}
+    .grab-delivery-box h3{font-size:14px;font-weight:700;color:#ff5200;margin-bottom:6px}
+    .grab-delivery-box p{font-size:12.5px;color:var(--text);line-height:1.5;margin-bottom:5px}
+    .grab-open-btn{display:inline-block;background:#ff5200;color:#fff;font-size:12.5px;font-weight:700;padding:8px 16px;border-radius:20px;cursor:pointer;margin-top:4px;border:none;transition:background .2s}
+    .grab-open-btn:hover{background:#d94400}
+    .promo-tag{display:inline-block;background:#fffde7;color:#f57f17;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin:2px}
+
+    /* ── Section tag ── */
+    .section-tag{text-align:center;font-size:11px;color:var(--light);padding:3px 0}
+
+    /* ── Reset btn ── */
+    .reset-wrap{display:flex;justify-content:center;padding:8px 0 4px}
+    .reset-btn{background:none;border:1.5px solid var(--border);color:var(--mid);font-size:12px;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all .2s}
+    .reset-btn:hover{border-color:var(--g);color:var(--g)}
+
+    /* ── Meal type tabs ── */
+    .meal-tabs{display:flex;gap:6px;padding:6px 13px 10px;flex-wrap:wrap}
+    .mt-btn{flex:1;min-width:110px;padding:10px 8px;border-radius:12px;border:2px solid var(--border);background:var(--w);cursor:pointer;text-align:center;transition:all .18s}
+    .mt-btn .mt-icon{font-size:22px;display:block;margin-bottom:3px}
+    .mt-btn .mt-label{font-size:12px;font-weight:700;color:var(--text);display:block}
+    .mt-btn .mt-sub{font-size:10.5px;color:var(--light);display:block}
+    .mt-btn:hover{border-color:var(--g);background:var(--gl)}
+    .mt-btn.grab{border-color:#ff5200}
+    .mt-btn.grab:hover{background:#fff5f0}
+    .mt-btn.grab .mt-label{color:#ff5200}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-av">🍽️</div>
+    <div class="hdr-info">
+      <h1>FoodFinder PJ</h1>
+      <p>First Avenue · One Utama · KL Valley</p>
+    </div>
+    <div class="hdr-r">
+      <div class="hbadge">🇲🇾 Grab HQ</div>
+      <div class="hpeak" id="peakBadge"></div>
+    </div>
+  </div>
+  <div class="chat" id="chat"></div>
+  <div class="qr" id="qr"></div>
+  <div class="inp-wrap">
+    <input type="text" id="inp" placeholder="Type a message or pick above…" autocomplete="off" />
+    <button class="sbtn" onclick="handleSend()">
+      <svg width="17" height="17" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ─── Peak time ────────────────────────────────────────────────────────────────
+function getPeak() {
+  const now = new Date(), h = now.getHours(), m = now.getMinutes();
+  const mins = h*60+m, wd = now.getDay(), weekend = wd===0||wd===6;
+  if (weekend) {
+    if (mins>=720&&mins<=900) return {level:'red',label:'🔴 Weekend Peak',note:'Busy 12–3 PM weekends. Expect 20–30 min waits.'};
+    if (mins>=660&&mins<=960) return {level:'yellow',label:'🟡 Getting Busy',note:'Moderate weekend crowds.'};
+  } else {
+    if (mins>=720&&mins<=810) return {level:'red',label:'🔴 Lunch Rush',note:'Peak 12–1:30 PM. Food courts fastest; sit-down adds 15–25 min.'};
+    if (mins>=1080&&mins<=1260) return {level:'yellow',label:'🟡 Dinner Rush',note:'Peak 6–9 PM. Popular spots fill up fast — book ahead.'};
+    if (mins>=660&&mins<=840) return {level:'yellow',label:'🟡 Pre/Post Rush',note:'Slightly busy. Aim before 11:45 AM or after 1:30 PM.'};
+  }
+  return {level:'green',label:'🟢 Off-Peak',note:'Good timing — minimal waits expected.'};
+}
+const PEAK = getPeak();
+const pb = document.getElementById('peakBadge');
+pb.textContent = PEAK.label; pb.className = 'hpeak '+PEAK.level;
+
+// ─── Database ─────────────────────────────────────────────────────────────────
+// mealTypes: 'lunch' | 'dinner' | 'both'
+// areas: first-avenue | one-utama | damansara-uptown | mutiara-damansara | bandar-utama | ttdi | damansara-kim | bangsar | mont-kiara | klcc
+const DB = [
+  // ════ LUNCH — FIRST AVENUE / ONE UTAMA ════════════════════════════════════
+  {id:1,name:"NIPPORI Bistro",loc:"One Utama, G207 Isetan Old Wing",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Japanese Fusion",walkMin:8,driveMin:null,priceRange:"RM31–50",priceNum:40,
+   googleRating:4.5,reviews:"600+",vibe:"chill",capacity:"medium",waitPeak:"slow",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch","dinner"],
+   desc:"Viral Japanese home-style fusion — kombu pasta, foie gras sushi, wagyu bolognese. The PJ original was 'always fully booked'. No MSG, fresh produce daily.",
+   pt:"⚠️ Books out fast — reserve ahead: 03-8309 3254",deal:"Reservations strongly recommended",
+   trending:["tiktok","instagram","xhs"]},
+
+  {id:2,name:"IPPUDO Ramen",loc:"One Utama, Lower Ground Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Japanese Ramen",walkMin:9,driveMin:null,priceRange:"RM28–50",priceNum:38,
+   googleRating:4.6,reviews:"1,124",vibe:"moderate",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:false,grab:true,
+   bestFor:["overseas-guests","daily-lunch","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"World-famous Hakata ramen. Shiromaru and Akamaru are the go-to orders. Top-rated in the area. Great for guests wanting authentic Japanese ramen.",
+   pt:"Peak 12:30–1:30 PM — queue 10–15 min",deal:"On Grab delivery",
+   trending:["klfoodie","instagram"]},
+
+  {id:3,name:"Peranakan Place",loc:"One Utama, 1st Floor Promenade F221C",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Peranakan / Nyonya",walkMin:9,driveMin:null,priceRange:"RM20–40",priceNum:28,
+   googleRating:4.4,reviews:"446",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:false,grab:true,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"Authentic Nyonya — laksa, nasi pandan, ayam berempah, cendol. A uniquely Malaysian experience for introducing overseas guests to Peranakan culture.",
+   pt:"Service can slow at 12:30–1:30 PM peak",deal:null,
+   trending:["klfoodie"]},
+
+  {id:4,name:"Madam Kwan's",loc:"One Utama, Old Wing G Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Malaysian",walkMin:8,driveMin:null,priceRange:"RM25–45",priceNum:35,
+   googleRating:4.3,reviews:"1,200+",vibe:"chill",capacity:"large",waitPeak:"moderate",
+   halal:true,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"Iconic Malaysian restaurant. Nasi lemak, laksa, rendang — the full experience. A must for overseas guests getting their first taste of Malaysia.",
+   pt:"Peak 12–2 PM. Reservations recommended for 6+",deal:"Grab delivery promo available",
+   trending:["klfoodie"]},
+
+  {id:5,name:"Putien",loc:"One Utama, Old Wing G213A",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Fujian Chinese",walkMin:9,driveMin:null,priceRange:"RM35–70",priceNum:50,
+   googleRating:4.5,reviews:"2,057",vibe:"moderate",capacity:"large",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"Highly-rated Fujian Chinese — lor mee, yam ring, pork trotters. 2,057 Google reviews. Great for Chinese-speaking guests or anyone who loves authentic regional Chinese cuisine.",
+   pt:"Manageable at lunch; busier at dinner weekends",deal:null,
+   trending:["instagram","xhs","klfoodie"]},
+
+  {id:6,name:"Delicious by Madam Kwan's",loc:"One Utama, New Wing G Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Malaysian-Western Café",walkMin:8,driveMin:null,priceRange:"RM20–42",priceNum:30,
+   googleRating:4.1,reviews:"800+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:true,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch"],
+   desc:"Polished café with Malaysian signatures and Western options. Nasi lemak, sandwiches, cakes. Softer environment — good for 1-on-1 or small team lunches.",
+   pt:"Moderately busy 12–1:30 PM",deal:null,trending:["klfoodie"]},
+
+  {id:7,name:"Din Tai Fung",loc:"One Utama, New Wing 1st Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Taiwanese / Dim Sum",walkMin:9,driveMin:null,priceRange:"RM35–70",priceNum:50,
+   googleRating:4.0,reviews:"500+",vibe:"moderate",capacity:"large",waitPeak:"slow",
+   halal:false,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"World-famous XLB (xiao long bao), priced 30–40% cheaper than Singapore. Great for SE Asian/Taiwanese guests or dim sum fans. Queue on weekends.",
+   pt:"🔴 HIGH WAIT: 40–60 min queue at peak. Go before 11:45 AM or after 2 PM.",deal:null,
+   trending:["instagram","xhs"]},
+
+  {id:8,name:"Nando's",loc:"One Utama, New Wing G Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Peri-Peri Chicken",walkMin:10,driveMin:null,priceRange:"RM22–38",priceNum:30,
+   googleRating:4.1,reviews:"900+",vibe:"moderate",capacity:"medium",waitPeak:"moderate",
+   halal:true,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch","dinner"],
+   desc:"Universal crowd-pleaser. Peri-peri chicken, shareable platters. Halal. Good for mixed groups with different tastes.",
+   pt:"Moderate wait 12:30–1:30 PM",deal:"Grab promo codes frequently available",
+   trending:[]},
+
+  {id:9,name:"Rakuzen",loc:"One Utama, New Wing 1st Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Japanese (Premium)",walkMin:9,driveMin:null,priceRange:"RM40–90",priceNum:65,
+   googleRating:4.3,reviews:"700+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"Premium Japanese — sashimi platters, bento sets, hot pots. Quiet, refined. Excellent for senior guests or Japanese visitors. Lunch sets are great value.",
+   pt:"Less crowded — manageable even at peak",deal:"Lunch set cheaper than dinner",
+   trending:[]},
+
+  {id:10,name:"Morganfield's",loc:"One Utama, New Wing G Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"American BBQ / Ribs",walkMin:10,driveMin:null,priceRange:"RM45–90",priceNum:65,
+   googleRating:4.1,reviews:"1,500+",vibe:"loud",capacity:"large",waitPeak:"moderate",
+   halal:false,veg:false,grab:true,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["lunch","dinner"],
+   desc:"Sticky bones, pulled pork, thick burgers. Best for celebratory team lunches. Not halal — confirm team dietary needs first.",
+   pt:"Busy 12:30–2 PM weekdays",deal:null,trending:[]},
+
+  {id:11,name:"Johnny's Restaurant",loc:"One Utama, Old Wing G Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Thai Steamboat / BBQ",walkMin:10,driveMin:null,priceRange:"RM35–60",priceNum:45,
+   googleRating:4.0,reviews:"300+",vibe:"loud",capacity:"large",waitPeak:"slow",
+   halal:true,veg:false,grab:false,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["lunch","dinner"],
+   desc:"Interactive steamboat and BBQ experience. Fun for groups with time to spare. Need minimum 1 hour — not for rushed lunches.",
+   pt:"Slow service — allow 1 hr+",deal:null,trending:[]},
+
+  {id:12,name:"Food Republic",loc:"One Utama, New Wing 3rd Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Multi-Concept Food Court",walkMin:9,driveMin:null,priceRange:"RM8–18",priceNum:12,
+   googleRating:4.0,reviews:"2,000+",vibe:"loud",capacity:"large",waitPeak:"fast",
+   halal:true,veg:true,grab:false,
+   bestFor:["daily-lunch","team-outing"],mealTypes:["lunch"],
+   desc:"Best for big mixed groups — everyone picks different stalls. Local, Japanese, Korean, Western under one roof. Fastest turnaround during lunch rush.",
+   pt:"Very busy 12–1:30 PM but turns over quickly",deal:null,trending:[]},
+
+  {id:13,name:"Papparich",loc:"One Utama, Old Wing LG Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Malaysian Kopitiam",walkMin:8,driveMin:null,priceRange:"RM10–22",priceNum:15,
+   googleRating:4.0,reviews:"600+",vibe:"moderate",capacity:"large",waitPeak:"fast",
+   halal:true,veg:true,grab:true,
+   bestFor:["daily-lunch","overseas-guests"],mealTypes:["lunch"],
+   desc:"Classic kopitiam — char kway teow, roti canai, kopi, nasi lemak. Weekday lunch sets are affordable. Genuine local flavour for guests on a budget.",
+   pt:"Busy 12–1 PM but fast turnover",deal:"Weekday lunch promo set",trending:[]},
+
+  {id:14,name:"Subway",loc:"First Avenue Block B, Ground Floor",area:"first-avenue",areaLabel:"In your office building",
+   cuisine:"Western / Sandwiches",walkMin:2,driveMin:null,priceRange:"RM12–20",priceNum:15,
+   googleRating:4.0,reviews:"200+",vibe:"chill",capacity:"small",waitPeak:"fast",
+   halal:true,veg:true,grab:true,
+   bestFor:["daily-lunch"],mealTypes:["lunch"],
+   desc:"Literally in your building — 2-minute walk. Fastest when you have under 20 minutes. Customisable subs, halal certified.",
+   pt:"Some queue 12–12:30 PM, clears fast",deal:"Sub of the Day on Grab",trending:[]},
+
+  {id:15,name:"The Chicken Rice Shop",loc:"One Utama, Old Wing LG Floor",area:"one-utama",areaLabel:"One Utama",
+   cuisine:"Malaysian Chinese",walkMin:8,driveMin:null,priceRange:"RM12–22",priceNum:17,
+   googleRating:4.0,reviews:"400+",vibe:"moderate",capacity:"medium",waitPeak:"fast",
+   halal:true,veg:false,grab:true,
+   bestFor:["daily-lunch","overseas-guests"],mealTypes:["lunch"],
+   desc:"Reliable roasted chicken rice and claypot dishes. Quick service, affordable. A solid local flavour experience for first-time guests.",
+   pt:"Fast service even during peak",deal:"Weekday lunch sets available",trending:[]},
+
+  // ════ LUNCH — NEARBY STREETS (NOT One Utama) ═════════════════════════════
+  {id:16,name:"Village Park Restaurant",loc:"5, Jalan SS 21/37, Damansara Uptown",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Malaysian Nasi Lemak",walkMin:null,driveMin:10,priceRange:"RM8–18",priceNum:13,
+   googleRating:4.5,reviews:"10,000+",vibe:"loud",capacity:"large",waitPeak:"moderate",
+   halal:true,veg:false,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch"],
+   desc:"Malaysia's most legendary nasi lemak. Fans drive from Johor just for this. Nasi Lemak Ayam Goreng is the order. Closes 5:30 PM — lunch window only.",
+   pt:"🔴 Queue 12–1:30 PM. Best before 11:30 AM or after 2 PM.",deal:null,
+   trending:["tiktok","instagram","xhs","klfoodie"]},
+
+  {id:17,name:"Hot Bird",loc:"83, Jalan SS 21/1a, Damansara Uptown",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Nashville Spicy Fried Chicken",walkMin:null,driveMin:10,priceRange:"RM18–32",priceNum:25,
+   googleRating:4.2,reviews:"800+",vibe:"loud",capacity:"medium",waitPeak:"moderate",
+   halal:true,veg:false,grab:true,
+   bestFor:["team-outing","daily-lunch"],mealTypes:["lunch"],
+   desc:"Viral Nashville-style spicy chicken in 6 heat levels. Cajun fries, coleslaw, milkshakes. Fun buzzy lunch — TikTok famous. Opens 12 PM.",
+   pt:"First 30 min after opening is least crowded",deal:"Grab delivery available",
+   trending:["tiktok","instagram","klfoodie"]},
+
+  {id:18,name:"Menya Hanabi",loc:"66, Jalan SS 21/62, Damansara Uptown",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Japanese Mazesoba",walkMin:null,driveMin:10,priceRange:"RM18–32",priceNum:25,
+   googleRating:4.3,reviews:"700+",vibe:"moderate",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:false,grab:true,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch"],
+   desc:"Famous broth-less ramen — mix everything at the table. Minced pork, garlic, egg yolk, thick noodles. Add free rice to finish the sauce. Trending on socials.",
+   pt:"Manageable even at 12:30 PM",deal:null,trending:["tiktok","instagram","klfoodie"]},
+
+  {id:19,name:"Inside Ipoh",loc:"46, Jalan SS 21/39, Damansara Uptown",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Ipoh / Malaysian Chinese",walkMin:null,driveMin:10,priceRange:"RM10–22",priceNum:15,
+   googleRating:4.3,reviews:"500+",vibe:"moderate",capacity:"large",waitPeak:"moderate",
+   halal:true,veg:false,grab:false,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch"],
+   desc:"Iconic Ipoh chicken hor fun, curry mee, chee cheong fun. Opens 7:30 AM, closes 3:30 PM. A regional Malaysian experience guests won't forget.",
+   pt:"Closes 3:30 PM — peak queue 11:30 AM–1 PM",deal:null,
+   trending:["klfoodie","instagram"]},
+
+  {id:20,name:"M Dining (Contemporary Thai)",loc:"Damansara Uptown, near Jalan SS21",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Contemporary Thai",walkMin:null,driveMin:12,priceRange:"RM30–80",priceNum:50,
+   googleRating:4.4,reviews:"300+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"Chef-driven modern Thai. Crab Delight Sliders (RM18), Scallop Betel Leaf, Panang Lamb Curry. Chef trained in Melbourne. Private dining available.",
+   pt:"Calmer than mall dining — call ahead for groups",deal:null,
+   trending:["klfoodie","instagram"]},
+
+  {id:21,name:"Flat 18",loc:"G-01, Bangunan Sterling Group, Mutiara Damansara",area:"mutiara-damansara",areaLabel:"Mutiara Damansara",
+   cuisine:"Western Café / All-Day Brunch",walkMin:null,driveMin:8,priceRange:"RM20–45",priceNum:32,
+   googleRating:4.4,reviews:"600+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch"],
+   desc:"Glass house café. Beautifully designed space, great Salt Beef Sourdough Sandwich. Perfect for impressing guests in a relaxed modern setting.",
+   pt:"Less peak pressure than One Utama on weekdays",deal:null,
+   trending:["klfoodie","instagram"]},
+
+  {id:22,name:"Ra Ra Coffee",loc:"Centrepoint Bandar Utama",area:"bandar-utama",areaLabel:"Bandar Utama",
+   cuisine:"Café / Western-Asian",walkMin:null,driveMin:5,priceRange:"RM15–35",priceNum:24,
+   googleRating:4.3,reviews:"400+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch"],
+   desc:"Muji-inspired café with playful dishes (Salmon Blu Blu Burgers), reliable coffee, comfort food. Featured by KL Foodie. Good for smaller catchups.",
+   pt:"Generally calm weekdays — good backup for One Utama rush",deal:null,
+   trending:["klfoodie","instagram"]},
+
+  {id:23,name:"Fullhouse Lifestyle Café",loc:"Centrepoint Bandar Utama",area:"bandar-utama",areaLabel:"Bandar Utama",
+   cuisine:"Western-Asian Fusion",walkMin:null,driveMin:5,priceRange:"RM20–45",priceNum:32,
+   googleRating:4.2,reviews:"2,000+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch"],
+   desc:"Instagrammable, cosy café. Pastas, Western mains, cakes. Great for guest entertainment on weekdays — far calmer than weekends.",
+   pt:"Calmer on weekdays — unhurried guest lunch",deal:null,
+   trending:["instagram"]},
+
+  // ════ DINNER — NEARBY (Uptown, TTDI, Damansara Kim) ══════════════════════
+  {id:24,name:"Table & Apron",loc:"8A, Jalan 13/6, Damansara Kim, PJ",area:"damansara-kim",areaLabel:"Damansara Kim",
+   cuisine:"Contemporary Comfort Food",walkMin:null,driveMin:15,priceRange:"RM55–95",priceNum:72,
+   googleRating:4.5,reviews:"1,500+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Neighbourhood favourite since 2014. Miso-mushroom pasta, buckwheat fried chicken, creative weekly specials. Also has Universal Bakehouse next door. Dinner Fri–Sun also open for lunch.",
+   pt:"Book ahead on weekends — fills quickly",deal:null,
+   trending:["klfoodie","instagram","tiktok"]},
+
+  {id:25,name:"Pinchos Tapas Bar",loc:"Jalan Tun Mohd Fuad 3, TTDI",area:"ttdi",areaLabel:"TTDI",
+   cuisine:"Spanish Tapas & Wine",walkMin:null,driveMin:15,priceRange:"RM40–75",priceNum:55,
+   googleRating:4.4,reviews:"700+",vibe:"moderate",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["dinner"],
+   desc:"Authentic Spanish tapas — patatas bravas, gambas al ajillo, croquetas, sangria. Fun communal dining style perfect for team nights. Lively but still conversational.",
+   pt:"Popular 7–9 PM — walk-in possible on weekdays",deal:null,
+   trending:["klfoodie","instagram"]},
+
+  {id:26,name:"Xinga Pot",loc:"58, Jalan SS 21/58, Damansara Uptown",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Chinese Hotpot",walkMin:null,driveMin:10,priceRange:"RM50–100",priceNum:70,
+   googleRating:4.2,reviews:"400+",vibe:"loud",capacity:"large",waitPeak:"moderate",
+   halal:false,veg:false,grab:false,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["dinner"],
+   desc:"Signature Golden Fish Tripe Macao Chicken Soup hotpot. Fresh geoduck, wagyu, scallops, clams. Opens 4 PM. A great interactive group dinner experience.",
+   pt:"Opens 4 PM — first seating quietest. Peak 7–9 PM.",deal:null,
+   trending:["klfoodie","instagram"]},
+
+  {id:27,name:"BBQ Ma Eul",loc:"48, Jalan SS 21/58, Damansara Uptown",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Korean BBQ",walkMin:null,driveMin:10,priceRange:"RM50–90",priceNum:65,
+   googleRating:4.2,reviews:"500+",vibe:"loud",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:false,grab:false,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["dinner"],
+   desc:"Authentic Korean BBQ — marinated pork belly, galbi, kimchi jjigae stew, refillable banchan. Fun, interactive dinner. Great for Korean guests or K-culture fans.",
+   pt:"Peak 7–9 PM. Arrive at 6 PM to avoid waits.",deal:null,
+   trending:["klfoodie","instagram"]},
+
+  {id:28,name:"Fujisawa Izakaya",loc:"52M, Jalan SS 21/58, Damansara Uptown",area:"damansara-uptown",areaLabel:"Damansara Uptown",
+   cuisine:"Japanese Izakaya",walkMin:null,driveMin:10,priceRange:"RM40–80",priceNum:55,
+   googleRating:4.2,reviews:"350+",vibe:"moderate",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:false,grab:false,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["dinner"],
+   desc:"Nostalgic 1970s izakaya deco. Aburi Hokkaido Maki, kushiyaki, kimchi udon, temaki. Great for Japanese guests or teams wanting a fun casual dinner.",
+   pt:"Manageable — walk-in friendly on weeknights",deal:null,
+   trending:["klfoodie"]},
+
+  // ════ DINNER — MID KL (Bangsar, Mont Kiara, TRX area) ═══════════════════
+  {id:29,name:"Yeast Bistronomy",loc:"24G, Jalan Telawi 2, Bangsar",area:"bangsar",areaLabel:"Bangsar",
+   cuisine:"French Bistro / Artisan Bakery",walkMin:null,driveMin:22,priceRange:"RM60–120",priceNum:85,
+   googleRating:4.6,reviews:"1,850",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Michelin-experienced team behind this French bistro. Stellar bread, classical French mains, great wine list. Perfect for European guests or a sophisticated team dinner. Opens from 6 PM for dinner.",
+   pt:"Book ahead for dinner — fills on weekends",deal:"Dinner from 6 PM",
+   trending:["klfoodie","instagram"]},
+
+  {id:30,name:"KOBU by Wagyu Tavern",loc:"Jalan Imbi / TRX area, KL",area:"klcc",areaLabel:"KL City / TRX",
+   cuisine:"Japanese Wagyu Omakase",walkMin:null,driveMin:30,priceRange:"RM200–400",priceNum:280,
+   googleRating:4.6,reviews:"300+",vibe:"chill",capacity:"small",waitPeak:"moderate",
+   halal:false,veg:false,grab:false,
+   bestFor:["overseas-guests"],mealTypes:["dinner"],
+   desc:"Unlimited omakase with A5 Wagyu, uni, caviar, ikura, truffle. Viral TikTok chef collab (DimSimLim). Free valet. The ultimate splurge dinner for impressing high-value guests.",
+   pt:"Reservation only — book at least 3–5 days ahead",deal:"Free valet parking",
+   trending:["tiktok","instagram","xhs"]},
+
+  {id:31,name:"Nobu KL",loc:"Level 4A, Four Seasons Place, KL",area:"klcc",areaLabel:"KL City",
+   cuisine:"Japanese-Peruvian Fusion",walkMin:null,driveMin:30,priceRange:"RM200–400",priceNum:280,
+   googleRating:4.4,reviews:"700+",vibe:"chill",capacity:"large",waitPeak:"moderate",
+   halal:false,veg:false,grab:false,
+   bestFor:["overseas-guests"],mealTypes:["dinner"],
+   desc:"World-renowned Nobu brand in KL. Black cod miso, yellowtail jalapeño, wagyu tataki. Stunning city views. The name alone impresses international guests.",
+   pt:"Reservations required — book online",deal:null,
+   trending:["instagram","xhs","klfoodie"]},
+
+  {id:32,name:"Kikyo",loc:"The Troika, 19 Persiaran KLCC",area:"klcc",areaLabel:"KLCC / Troika",
+   cuisine:"Japanese Fine Dining",walkMin:null,driveMin:30,priceRange:"RM150–300",priceNum:210,
+   googleRating:4.5,reviews:"400+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:false,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Tatler Dining Award Best Interior. A5 Wagyu, Josper-grilled meats, fresh seafood. Upstairs lounge for post-dinner cocktails. Excellent for Japanese guests or premium team evenings.",
+   pt:"Reservations recommended for groups",deal:null,
+   trending:["instagram","klfoodie"]},
+
+  {id:33,name:"Restaurant Shu KL",loc:"KLCC area, Kuala Lumpur",area:"klcc",areaLabel:"KL City",
+   cuisine:"Modern Chinese Heritage",walkMin:null,driveMin:30,priceRange:"RM100–200",priceNum:145,
+   googleRating:4.5,reviews:"200+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"MICHELIN Guide Young Chef Award 2026 winner. Explores Chinese diaspora cuisine with modern technique — an open kitchen, white tablecloth experience with deep cultural storytelling.",
+   pt:"Book ahead — gaining buzz fast",deal:"Michelin Guide recommended",
+   trending:["instagram","klfoodie"]},
+
+  {id:34,name:"Langkasuka at Gaia's KL",loc:"Level 37, Ilham Tower, KLCC",area:"klcc",areaLabel:"KLCC",
+   cuisine:"Thai & Malay Grill",walkMin:null,driveMin:30,priceRange:"RM80–150",priceNum:110,
+   googleRating:4.4,reviews:"300+",vibe:"chill",capacity:"large",waitPeak:"moderate",
+   halal:true,vibe:"chill",veg:false,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Thai and Malay grill high above KLCC. Breathtaking city views. Traditional flavours with modern technique. One of the rare premium halal fine dining options with skyline views.",
+   pt:"Book ahead for window seats",deal:null,
+   trending:["instagram","xhs"]},
+
+  {id:35,name:"Bistro Kia Peng",loc:"Level 7M, Marriott Executive Apts, KLCC",area:"klcc",areaLabel:"KLCC",
+   cuisine:"Modern Malaysian",walkMin:null,driveMin:30,priceRange:"RM70–130",priceNum:95,
+   googleRating:4.2,reviews:"150+",vibe:"chill",capacity:"medium",waitPeak:"moderate",
+   halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Opened 2025. Casually refined modern Malaysian — familiar flavours elevated. Private dining room available. Good value for KLCC location. Express lunch options too.",
+   pt:"Newer — easier to get reservations than established spots",deal:null,
+   trending:["instagram"]},
+];
+
+// ─── Extended dietary & health properties ─────────────────────────────────────
+// vegan: has real vegan options (no meat/dairy/eggs)
+// noBeef: can accommodate no-beef requests (false only for all-beef concepts)
+// healthy: lighter, lower-cal options prominently available
+// gfFriendly: has options that can avoid wheat/gluten (not certified GF — always verify)
+const DIET_EXTRA = {
+  1: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:false}, // NIPPORI (no MSG, plant dishes)
+  2: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // IPPUDO (wheat noodles)
+  3: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Peranakan (belacan, pork)
+  4: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Madam Kwan's (soy sauce base)
+  5: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Putien (Buddhist veg dishes)
+  6: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Delicious (soy/oyster sauce)
+  7: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Din Tai Fung (wheat wrappers)
+  8: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Nando's (GF sides, grilled)
+  9: {vegan:false, noBeef:true,  healthy:true,  gfFriendly:true},  // Rakuzen (sashimi, rice dishes)
+ 10: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Morganfield's (BBQ glazes)
+ 11: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Johnny's (steamboat sauces)
+ 12: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Food Republic (vegan stalls)
+ 13: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Papparich (lard, soy sauce)
+ 14: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:false}, // Subway (veggie sub, customisable)
+ 15: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Chicken Rice Shop (soy)
+ 16: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Village Park (marinade)
+ 17: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Hot Bird (fried, wheat coating)
+ 18: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Menya Hanabi (wheat noodles)
+ 19: {vegan:false, noBeef:true,  healthy:true,  gfFriendly:true},  // Inside Ipoh (rice noodles, light)
+ 20: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:false}, // M Dining (chef-driven Thai)
+ 21: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Flat 18 (modern café)
+ 22: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Ra Ra Coffee (café)
+ 23: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Fullhouse (pastas etc)
+ 24: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Table & Apron (plant-forward)
+ 25: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Pinchos (croquetas, bread)
+ 26: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Xinga Pot (hotpot sauces)
+ 27: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // BBQ Ma Eul (soy marinades)
+ 28: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Fujisawa (soy-based)
+ 29: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Yeast Bistronomy (French fine dining)
+ 30: {vegan:false, noBeef:false, healthy:false, gfFriendly:true},  // KOBU (all-beef wagyu omakase)
+ 31: {vegan:false, noBeef:true,  healthy:true,  gfFriendly:true},  // Nobu KL (sashimi, seafood)
+ 32: {vegan:false, noBeef:true,  healthy:true,  gfFriendly:true},  // Kikyo (Japanese fine dining)
+ 33: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Restaurant Shu KL (Michelin)
+ 34: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Langkasuka (grill-heavy)
+ 35: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Bistro Kia Peng (modern MY)
+};
+DB.forEach(r => {
+  const ex = DIET_EXTRA[r.id] || {};
+  r.vegan      = ex.vegan      ?? false;
+  r.noBeef     = ex.noBeef     ?? true;
+  r.healthy    = ex.healthy    ?? false;
+  r.gfFriendly = ex.gfFriendly ?? false;
+});
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let S = {
+  step:'occasion',occasion:null,mealType:null,planningAhead:null,areaFilter:null,
+  groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,
+  last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]
+};
+
+// ─── Area filter logic ────────────────────────────────────────────────────────
+const LUNCH_AREA_SETS = {
+  'one-utama-only': new Set(['first-avenue','one-utama']),
+  'avoid-one-utama': new Set(['damansara-uptown','mutiara-damansara','bandar-utama']),
+  'any-nearby': new Set(['first-avenue','one-utama','damansara-uptown','mutiara-damansara','bandar-utama']),
+};
+const DINNER_AREA_SETS = {
+  'pj-nearby': new Set(['one-utama','damansara-uptown','mutiara-damansara','bandar-utama','ttdi','damansara-kim']),
+  'mid-kl': new Set(['bangsar','mont-kiara','damansara-kim','ttdi']),
+  'anywhere': new Set(['one-utama','damansara-uptown','mutiara-damansara','bandar-utama','ttdi','damansara-kim','bangsar','mont-kiara','klcc']),
+};
+
+// ─── Dish Map ─────────────────────────────────────────────────────────────────
+// Each entry maps keyword aliases → restaurant IDs with a specialty note
+const DISH_MAP = [
+  { keys:['nasi lemak','nasi lema','coconut rice','sambal chicken','nasi lemak ayam'],
+    matches:[
+      {id:16,note:"🏆 Malaysia's most legendary nasi lemak — the Nasi Lemak Ayam Goreng (4.5★, 10k+ reviews) is the reason people drive across KL"},
+      {id:4,note:"Madam Kwan's nasi lemak is the restaurant version of a national classic — great for guests"},
+      {id:12,note:"Papparich's weekday nasi lemak set is the affordable, no-fuss option"},
+    ]},
+  { keys:['ramen','tonkotsu','hakata ramen','shoyu ramen','miso ramen','japanese noodle soup'],
+    matches:[
+      {id:2,note:"🏆 IPPUDO is a globally famous Hakata ramen chain — their Shiromaru and Akamaru are the go-to orders (4.6★, 1,124 reviews)"},
+    ]},
+  { keys:['mazesoba','maze soba','dry ramen','brothless ramen','broth-less ramen','abura soba'],
+    matches:[
+      {id:18,note:"🏆 Menya Hanabi's entire identity is mazesoba — mix the minced pork, garlic, egg yolk and thick noodles, then finish with a free rice scoop"},
+    ]},
+  { keys:['xiao long bao','xlb','soup dumpling','dim sum','dimsum','steamed bun','har gao','siew mai'],
+    matches:[
+      {id:7,note:"🏆 Din Tai Fung is world-famous for XLB — KL prices are 30–40% cheaper than Singapore"},
+      {id:5,note:"Putien does authentic Fujian dim sum-style shared plates — yam ring and lor mee are their standouts"},
+    ]},
+  { keys:['chicken rice','nasi ayam','hainanese chicken','roasted chicken rice'],
+    matches:[
+      {id:15,note:"🏆 The Chicken Rice Shop literally exists for this — roasted chicken rice is their core dish"},
+      {id:16,note:"Village Park's fried chicken alongside their nasi lemak is legendary on its own"},
+    ]},
+  { keys:['laksa','nyonya laksa','curry laksa','asam laksa','penang laksa'],
+    matches:[
+      {id:3,note:"🏆 Peranakan Place's Nyonya Laksa is an authentic signature — they're known for it"},
+      {id:4,note:"Madam Kwan's laksa is one of their most re-ordered dishes"},
+      {id:12,note:"Papparich's curry laksa is a solid daily option at kopitiam prices"},
+    ]},
+  { keys:['peri peri','peri-peri','flame grilled','nandos',"nando's",'flame-grilled chicken'],
+    matches:[
+      {id:8,note:"🏆 Nando's — peri-peri chicken IS their entire concept. Half chicken, shareable platters, heat levels from plain to reaper"},
+    ]},
+  { keys:['spicy fried chicken','nashville chicken','hot chicken','fried chicken','crispy chicken tenders'],
+    matches:[
+      {id:17,note:"🏆 Hot Bird is built around Nashville-style spicy fried chicken — 6 heat levels from mild to Reaper. The tenders with Cajun fries are their signature"},
+    ]},
+  { keys:['ribs','sticky ribs','sticky bones','bbq ribs','pulled pork','american bbq','rack of ribs'],
+    matches:[
+      {id:10,note:"🏆 Morganfield's is KL's definitive sticky ribs spot — the Sticky Bones are the whole reason to visit"},
+    ]},
+  { keys:['sushi','sashimi','nigiri','temaki','maki','japanese sushi'],
+    matches:[
+      {id:9,note:"Rakuzen — premium sashimi platters and omakase bento. Quieter and more refined than belt sushi"},
+      {id:1,note:"NIPPORI's foie gras sushi is their viral signature — you'll see it all over Instagram and XHS"},
+      {id:32,note:"Kikyo at The Troika for full Japanese fine dining sushi experience (Tatler Award winner)"},
+    ]},
+  { keys:['wagyu','a5 wagyu','wagyu beef','japanese beef','marbled beef'],
+    matches:[
+      {id:30,note:"🏆 KOBU by Wagyu Tavern — unlimited A5 Wagyu omakase. Viral TikTok collab with DimSimLim. The ceiling for wagyu in KL right now"},
+      {id:32,note:"Kikyo at The Troika — A5 Wagyu with Josper-grilled technique, premium dinner setting"},
+    ]},
+  { keys:['omakase','chef menu','tasting menu','chef table'],
+    matches:[
+      {id:30,note:"🏆 KOBU by Wagyu Tavern — the most talked-about omakase in KL right now (viral TikTok)"},
+      {id:32,note:"Kikyo — Tatler Dining Award winner, proper Japanese omakase at The Troika"},
+      {id:9,note:"Rakuzen at 1 Utama for accessible premium Japanese sets without the full splurge"},
+    ]},
+  { keys:['hotpot','hot pot','steamboat','shabu shabu','mookata'],
+    matches:[
+      {id:26,note:"🏆 Xinga Pot — their Signature Golden Fish Tripe Macao Chicken Soup is the specialty. Fresh geoduck, wagyu, clams"},
+      {id:11,note:"Johnny's Restaurant — classic Thai-style steamboat and BBQ, great for group dining"},
+    ]},
+  { keys:['korean bbq','kbbq','korean barbeque','samgyeopsal','galbi','pork belly bbq','bulgogi'],
+    matches:[
+      {id:27,note:"🏆 BBQ Ma Eul specialises in Korean BBQ — marinated pork belly, galbi, refillable banchan. Authentic Uptown experience"},
+    ]},
+  { keys:['char kway teow','ckt','fried kway teow','wok noodles'],
+    matches:[
+      {id:12,note:"Papparich's char kway teow is a kopitiam staple — their most-ordered noodle dish"},
+      {id:11,note:"Food Republic has wok stalls that do solid CKT-style fried noodles"},
+    ]},
+  { keys:['roti canai','roti prata','mamak','teh tarik','milo ais','roti tissue'],
+    matches:[
+      {id:12,note:"🏆 Papparich is literally a kopitiam — roti canai with dhal and teh tarik is what they're built on"},
+    ]},
+  { keys:['tapas','spanish food','pintxos','sangria','patatas bravas','croquetas','gambas'],
+    matches:[
+      {id:25,note:"🏆 Pinchos Tapas Bar in TTDI specialises in authentic Spanish tapas — patatas bravas, gambas al ajillo, croquetas. The real deal"},
+    ]},
+  { keys:['french food','french cuisine','croissant','baguette','french bistro','escargot','steak frites'],
+    matches:[
+      {id:29,note:"🏆 Yeast Bistronomy in Bangsar — Michelin-experienced French bistro (4.6★, 1,850 reviews). The artisan bakery out front is equally good"},
+    ]},
+  { keys:['black cod','miso cod','black cod miso','nobu black cod'],
+    matches:[
+      {id:31,note:"🏆 Nobu KL's Black Cod Miso is their world-famous, globally iconic signature dish — it's the reason to visit"},
+    ]},
+  { keys:['hor fun','hor mee','ipoh hor fun','ipoh chicken noodle','flat rice noodle'],
+    matches:[
+      {id:19,note:"🏆 Inside Ipoh exists specifically for Ipoh-style chicken hor fun — it's the only thing you need to order"},
+    ]},
+  { keys:['nyonya food','peranakan','babi pongteh','ayam buah keluak','nyonya curry'],
+    matches:[
+      {id:3,note:"🏆 Peranakan Place is dedicated entirely to Nyonya cuisine — laksa, nasi pandan, ayam berempah are all house specialties"},
+    ]},
+  { keys:['pasta','spaghetti','carbonara','aglio olio','bolognese','penne','udon pasta'],
+    matches:[
+      {id:1,note:"🏆 NIPPORI's Deep Sea Kombu Pasta and Wagyu Bolognese are viral signatures — featured across TikTok and XHS"},
+      {id:29,note:"Yeast Bistronomy does beautifully crafted French-style pasta dishes alongside their mains"},
+    ]},
+  { keys:['sandwich','sourdough sandwich','salt beef','beef sandwich','toastie'],
+    matches:[
+      {id:21,note:"🏆 Flat 18's Salt Beef Sourdough Sandwich is their must-order — it's what KL Foodie went there for"},
+      {id:14,note:"Subway in your office building — fastest customisable sandwich, 2-minute walk"},
+    ]},
+  { keys:['burger','smash burger','beef burger','cheeseburger','double patty'],
+    matches:[
+      {id:17,note:"Hot Bird's Hot Bird Brioche Bun Burger is a fan favourite alongside their spicy chicken"},
+      {id:10,note:"Morganfield's thick American burgers are solid alongside their famous ribs"},
+    ]},
+  { keys:['yong tau fu','yong tau foo','ytf','stuffed tofu'],
+    matches:[
+      {id:0,note:"Closest option: try the hawker section in Food Republic (One Utama) — they usually have a yong tau fu stall"},
+    ]},
+  { keys:['foie gras','foie gras sushi','duck liver'],
+    matches:[
+      {id:1,note:"🏆 NIPPORI's Foie Gras Heaven sushi is one of their viral signature dishes — it's the most-photographed item on the menu"},
+    ]},
+  { keys:['satay','grilled chicken satay','peanut sauce satay'],
+    matches:[
+      {id:4,note:"Madam Kwan's serves satay as part of their classic Malaysian spread — great for guests wanting the full local experience"},
+    ]},
+  { keys:['rendang','beef rendang','lamb rendang'],
+    matches:[
+      {id:4,note:"🏆 Madam Kwan's rendang is one of their signature dishes — slow-cooked, dry-style, the Malaysian classic"},
+    ]},
+  { keys:['kombu','seaweed pasta','kombu pasta'],
+    matches:[
+      {id:1,note:"🏆 NIPPORI's Deep Sea Kombu Pasta is their hero dish — spaghetti with seaweed and seafood, viral on TikTok and XHS"},
+    ]},
+  { keys:['hotdog','hot dog','sausage'],
+    matches:[
+      {id:14,note:"Subway in your building has sausage and hotdog options — quickest grab"},
+    ]},
+];
+
+function matchDish(input) {
+  const q = input.toLowerCase().trim();
+  for (const entry of DISH_MAP) {
+    if (entry.keys.some(k => q.includes(k) || k.includes(q))) {
+      return entry;
+    }
+  }
+  return null;
+}
+
+// ─── Menu URLs (sourced from Google Business, websites, Instagram) ────────────
+// ─── Menu priority: pdf > google > website > instagram ────────────────────────
+// google = Google Maps search URL (opens business card with Menu button)
+const MENUS = {
+  1:  { google:'https://www.google.com/maps/search/NIPPORI+Bistro+One+Utama+Petaling+Jaya',
+        instagram:'https://www.instagram.com/nippori.bistro/' },
+  2:  { google:'https://www.google.com/maps/search/IPPUDO+Ramen+One+Utama+Petaling+Jaya',
+        website:'https://www.ippudo.com.my/' },
+  3:  { pdf:'https://peranakan-place-signature-one-utama.menufyy.com/',
+        google:'https://www.google.com/maps/search/Peranakan+Place+One+Utama+Petaling+Jaya' },
+  4:  { website:'https://www.madamkwans.com.my/menu/',
+        google:'https://www.google.com/maps/search/Madam+Kwans+One+Utama+Petaling+Jaya' },
+  5:  { website:'https://www.putien.com/menu/',
+        google:'https://www.google.com/maps/search/Putien+One+Utama+Petaling+Jaya' },
+  6:  { website:'https://deliciousgroup.com.my/menus/',
+        google:'https://www.google.com/maps/search/Delicious+by+Madam+Kwans+One+Utama' },
+  7:  { website:'https://www.dintaifung.com/menu/',
+        google:'https://www.google.com/maps/search/Din+Tai+Fung+One+Utama+Petaling+Jaya' },
+  8:  { website:'https://www.nandos.com.my/food/menu',
+        google:'https://www.google.com/maps/search/Nandos+One+Utama+Petaling+Jaya' },
+  9:  { google:'https://www.google.com/maps/search/Rakuzen+One+Utama+Petaling+Jaya',
+        instagram:'https://www.instagram.com/rakuzen_my/' },
+  10: { website:'https://www.morganfields.com.my/menu/',
+        google:'https://www.google.com/maps/search/Morganfields+One+Utama+Petaling+Jaya' },
+  11: { google:'https://www.google.com/maps/search/Johnnys+Restaurant+One+Utama+Petaling+Jaya',
+        website:'https://www.foodpanda.my/restaurant/s1aj/johnnys-restaurant-1-utama' },
+  12: { website:'https://foodrepublic.com.my/outlets/1-utama/',
+        google:'https://www.google.com/maps/search/Food+Republic+One+Utama+Petaling+Jaya' },
+  13: { website:'https://www.papparich.com.my/menu/',
+        google:'https://www.google.com/maps/search/Papparich+One+Utama+Petaling+Jaya' },
+  14: { pdf:'https://www.subway.com/en-MY/MenuNutrition/Menu',
+        google:'https://www.google.com/maps/search/Subway+First+Avenue+Petaling+Jaya' },
+  15: { website:'https://www.thechickenriceshop.com/menu/',
+        google:'https://www.google.com/maps/search/The+Chicken+Rice+Shop+One+Utama' },
+  16: { google:'https://www.google.com/maps/search/Village+Park+Restaurant+Damansara+Uptown',
+        instagram:'https://www.instagram.com/villageparkofficial/' },
+  17: { google:'https://www.google.com/maps/search/Hot+Bird+Damansara+Uptown+Petaling+Jaya',
+        instagram:'https://www.instagram.com/hot_bird_malaysia/' },
+  18: { website:'https://menyahanabi.com.my/menu/',
+        google:'https://www.google.com/maps/search/Menya+Hanabi+Damansara+Uptown' },
+  19: { google:'https://www.google.com/maps/search/Inside+Ipoh+Damansara+Uptown',
+        instagram:'https://www.instagram.com/insideipoh/' },
+  20: { google:'https://www.google.com/maps/search/M+Dining+Damansara+Uptown',
+        instagram:'https://www.instagram.com/mdining.my/' },
+  21: { google:'https://www.google.com/maps/search/Flat+18+Mutiara+Damansara',
+        instagram:'https://www.instagram.com/flat18kl/' },
+  22: { google:'https://www.google.com/maps/search/Ra+Ra+Coffee+Bandar+Utama',
+        instagram:'https://www.instagram.com/raracoffee/' },
+  23: { website:'https://www.fullhouse.com.my/menu/',
+        google:'https://www.google.com/maps/search/Fullhouse+Bandar+Utama+Centrepoint' },
+  24: { website:'https://www.tableandapron.my/food-drink',
+        google:'https://www.google.com/maps/search/Table+and+Apron+Damansara+Kim' },
+  25: { google:'https://www.google.com/maps/search/Pinchos+Tapas+Bar+TTDI+Kuala+Lumpur',
+        instagram:'https://www.instagram.com/pinchostapasbar/' },
+  26: { website:'https://www.xingapot.com/menu/',
+        google:'https://www.google.com/maps/search/Xinga+Pot+Damansara+Uptown' },
+  27: { google:'https://www.google.com/maps/search/BBQ+Ma+Eul+Damansara+Uptown',
+        instagram:'https://www.instagram.com/bbqmaeulcupbab/' },
+  28: { google:'https://www.google.com/maps/search/Fujisawa+Izakaya+Damansara+Uptown',
+        instagram:'https://www.instagram.com/fujisawa_izakaya/' },
+  29: { website:'https://yeastgroup.my/bangsar/',
+        google:'https://www.google.com/maps/search/Yeast+Bistronomy+Bangsar+Kuala+Lumpur' },
+  30: { website:'https://kobu.com.my/',
+        google:'https://www.google.com/maps/search/KOBU+Wagyu+Tavern+Kuala+Lumpur' },
+  31: { website:'https://www.noburestaurants.com/kualalumpur/experience/menus/',
+        google:'https://www.google.com/maps/search/Nobu+KL+Four+Seasons+Kuala+Lumpur' },
+  32: { website:'https://www.kikyo.com.my/',
+        google:'https://www.google.com/maps/search/Kikyo+The+Troika+KLCC+Kuala+Lumpur' },
+  33: { website:'https://www.restaurantshu.com/',
+        google:'https://www.google.com/maps/search/Restaurant+Shu+KL+Kuala+Lumpur' },
+  34: { website:'https://gaiaskl.com/',
+        google:'https://www.google.com/maps/search/Langkasuka+Ilham+Tower+KLCC' },
+  35: { website:'https://www.bistrokiapeng.com/',
+        google:'https://www.google.com/maps/search/Bistro+Kia+Peng+KLCC+Marriott+Kuala+Lumpur' },
+};
+
+function getMenuLink(id) {
+  const m = MENUS[id]; if (!m) return null;
+  if (m.pdf)       return { url: m.pdf,       label: '📄 Menu (PDF)', title: 'Direct menu PDF' };
+  if (m.google)    return { url: m.google,     label: '🔍 Menu on Google', title: 'Opens Google Business — tap the Menu button' };
+  if (m.website)   return { url: m.website,    label: '📋 View Menu', title: 'Official website menu' };
+  if (m.instagram) return { url: m.instagram,  label: '📸 Menu on Instagram', title: 'Browse posts for menu' };
+  return null;
+}
+
+// ─── "More like this" cuisine sub-options ─────────────────────────────────────
+const CUISINE_SUBS = {
+  'Japanese Ramen':          [{l:'🍜 More ramen spots',v:'ramen'},{l:'🍱 Japanese noodles broadly',v:'japanese noodle soup'}],
+  'Japanese Fusion':         [{l:'🍝 Fusion pasta (kombu / wagyu bolognese)',v:'pasta'},{l:'🍣 Foie gras sushi',v:'foie gras'},{l:'🍱 Japanese fusion broadly',v:'japanese'}],
+  'Japanese (Premium)':      [{l:'🍣 Sashimi & sushi',v:'sashimi'},{l:'🥩 Wagyu',v:'wagyu'},{l:'🍱 Omakase',v:'omakase'}],
+  'Japanese Mazesoba':       [{l:'🍜 Mazesoba / broth-less ramen',v:'mazesoba'},{l:'🍜 Japanese noodles',v:'ramen'}],
+  'Japanese Wagyu Omakase':  [{l:'🥩 More wagyu',v:'wagyu'},{l:'🍱 Omakase experience',v:'omakase'}],
+  'Japanese Fine Dining':    [{l:'🍣 Sushi / omakase',v:'omakase sushi'},{l:'🥩 Wagyu',v:'wagyu'}],
+  'Japanese Izakaya':        [{l:'🍣 Izakaya-style sushi',v:'sushi'},{l:'🍜 Japanese noodles',v:'ramen'},{l:'🍱 Japanese sharing plates',v:'japanese'}],
+  'Japanese-Peruvian Fusion':[{l:'🐟 Black cod miso',v:'black cod'},{l:'🍱 Japanese fine dining',v:'omakase'}],
+  'Japanese Market Café':    [{l:'🍱 Japanese rice sets',v:'japanese'},{l:'🍜 Ramen',v:'ramen'}],
+  'Malaysian':               [{l:'🍛 Nasi lemak',v:'nasi lemak'},{l:'🍲 Laksa',v:'laksa'},{l:'🍗 Satay',v:'satay'},{l:'🍖 Rendang',v:'rendang'}],
+  'Malaysian Nasi Lemak':    [{l:'🍛 More nasi lemak spots',v:'nasi lemak'},{l:'🍗 Fried chicken (Malaysian)',v:'fried chicken'}],
+  'Malaysian Kopitiam':      [{l:'🫓 Roti canai',v:'roti canai'},{l:'🍜 Char kway teow',v:'char kway teow'},{l:'🍛 Nasi lemak',v:'nasi lemak'}],
+  'Malaysian-Western Café':  [{l:'🍛 Malaysian classics',v:'nasi lemak'},{l:'🥪 Café Western',v:'sandwich'}],
+  'Malaysian Chinese':       [{l:'🍗 Chicken rice',v:'chicken rice'},{l:'🍜 Noodles',v:'hor fun'}],
+  'Peranakan / Nyonya':      [{l:'🍜 Nyonya laksa',v:'nyonya laksa'},{l:'🍛 Peranakan mains',v:'nyonya food'}],
+  'Ipoh / Malaysian Chinese':[{l:'🍜 Ipoh hor fun',v:'hor fun'},{l:'🍲 Malaysian Chinese noodles',v:'char kway teow'}],
+  'Fujian Chinese':          [{l:'🥟 Dim sum & dumplings',v:'dim sum'},{l:'🍜 Fujian noodles',v:'hor fun'}],
+  'Taiwanese / Dim Sum':     [{l:'🥟 XLB / Soup dumplings',v:'xiao long bao'},{l:'🥟 Dim sum broadly',v:'dim sum'}],
+  'Chinese Hotpot':          [{l:'🫕 More hotpot',v:'hotpot'},{l:'🫕 Steamboat',v:'steamboat'}],
+  'Peri-Peri Chicken':       [{l:'🍗 Flame-grilled chicken',v:'peri peri'},{l:'🔥 Spicy chicken broadly',v:'spicy fried chicken'}],
+  'Nashville Spicy Fried Chicken':[{l:'🔥 Spicy fried chicken',v:'spicy fried chicken'},{l:'🍔 Chicken burger',v:'burger'}],
+  'American BBQ / Ribs':     [{l:'🍖 Sticky ribs',v:'ribs'},{l:'🍔 Burgers',v:'burger'},{l:'🥩 American BBQ broadly',v:'american bbq'}],
+  'Contemporary Thai':       [{l:'🌶️ Thai mains',v:'bold'},{l:'🦀 Thai seafood',v:'bold'},{l:'🌿 Modern Asian',v:'any'}],
+  'Thai Steamboat / BBQ':    [{l:'🫕 Steamboat',v:'steamboat'},{l:'🔥 BBQ grill',v:'bbq'}],
+  'Spanish Tapas & Wine':    [{l:'🥘 Spanish tapas',v:'tapas'},{l:'🍷 Wine & sharing plates',v:'tapas'}],
+  'French Bistro / Artisan Bakery':[{l:'🥐 Pastries & bread',v:'croissant'},{l:'🍽️ French bistro mains',v:'french food'}],
+  'Korean BBQ':              [{l:'🥩 More Korean BBQ',v:'korean bbq'},{l:'🍖 Grilled meats broadly',v:'ribs'}],
+  'Western Café / All-Day Brunch':[{l:'🥪 Sourdough sandwiches',v:'sandwich'},{l:'🍳 Brunch / café food',v:'light'}],
+  'Café / Western-Asian':    [{l:'☕ Café vibes',v:'light'},{l:'🥗 Light Western meals',v:'sandwich'}],
+  'Contemporary Comfort Food':[{l:'🍝 Pasta / comfort mains',v:'pasta'},{l:'🍗 Creative proteins',v:'western'}],
+  'Western-Asian Fusion':    [{l:'🍝 Pasta',v:'pasta'},{l:'🥗 Light café meals',v:'light'}],
+  'Modern Malaysian':        [{l:'🍛 Malaysian classics',v:'malaysian'},{l:'🍽️ Modern Asian',v:'any'}],
+  'Modern Chinese Heritage': [{l:'🥢 Chinese heritage dishes',v:'chinese'},{l:'🐟 Seafood',v:'any'}],
+  'Thai & Malay Grill':      [{l:'🌶️ Thai grills',v:'bold'},{l:'🇲🇾 Malay grill',v:'malaysian'}],
+};
+
+function getCuisineSubOptions(r) {
+  const subs = CUISINE_SUBS[r.cuisine];
+  if (subs) return subs;
+  // Fallback: extract first word of cuisine as search
+  const fallback = r.cuisine.split('/')[0].split(' ')[0].toLowerCase();
+  return [{l:`More ${r.cuisine}`, v: fallback}];
+}
+
+// ─── Operating Hours (24h decimal, e.g. 17.5 = 5:30 PM) ─────────────────────
+// days: 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
+// extDays + extOpen = extended hours on certain days (e.g. Table & Apron Fri–Sun lunch)
+const HOURS = {
+  1:  {days:[0,1,2,3,4,5,6], open:10.5, close:22},              // NIPPORI (1U mall hrs)
+  2:  {days:[0,1,2,3,4,5,6], open:10.5, close:22},              // IPPUDO
+  3:  {days:[0,1,2,3,4,5,6], open:10,   close:22},              // Peranakan Place
+  4:  {days:[0,1,2,3,4,5,6], open:11,   close:22},              // Madam Kwan's
+  5:  {days:[0,1,2,3,4,5,6], open:11,   close:22},              // Putien
+  6:  {days:[0,1,2,3,4,5,6], open:10,   close:22},              // Delicious
+  7:  {days:[0,1,2,3,4,5,6], open:11,   close:21.25},           // Din Tai Fung (till 9:15 PM)
+  8:  {days:[0,1,2,3,4,5,6], open:10,   close:22},              // Nando's
+  9:  {days:[0,1,2,3,4,5,6], open:11,   close:22},              // Rakuzen
+  10: {days:[0,1,2,3,4,5,6], open:11,   close:22},              // Morganfield's
+  11: {days:[0,1,2,3,4,5,6], open:10,   close:21},              // Johnny's
+  12: {days:[0,1,2,3,4,5,6], open:10,   close:22},              // Food Republic
+  13: {days:[0,1,2,3,4,5,6], open:7,    close:22},              // Papparich
+  14: {days:[1,2,3,4,5],     open:8,    close:20},              // Subway (office block, Mon–Fri only)
+  15: {days:[0,1,2,3,4,5,6], open:10,   close:22},              // Chicken Rice Shop
+  16: {days:[0,1,2,3,4,5,6], open:6.5,  close:17.5},            // Village Park ⚠️ closes 5:30 PM
+  17: {days:[0,1,2,3,4,5,6], open:12,   close:21.5},            // Hot Bird (opens 12 PM)
+  18: {days:[0,1,2,3,4,5,6], open:12,   close:22},              // Menya Hanabi (opens 12 PM)
+  19: {days:[0,1,2,3,4,5,6], open:7.5,  close:15.5},            // Inside Ipoh ⚠️ closes 3:30 PM
+  20: {days:[0,1,2,3,4,5,6], open:12,   close:22},              // M Dining
+  21: {days:[0,1,2,3,4,5,6], open:9,    close:22},              // Flat 18
+  22: {days:[0,1,2,3,4,5,6], open:9,    close:21},              // Ra Ra Coffee
+  23: {days:[0,1,2,3,4,5,6], open:10,   close:22},              // Fullhouse
+  24: {days:[0,1,2,3,4,5,6], open:17.5, close:22.5,             // Table & Apron: dinner-only Mon–Thu
+       extDays:[0,5,6], extOpen:11.5},                          //   but Fri–Sun also has lunch from 11:30
+  25: {days:[0,2,3,4,5,6],   open:12,   close:23},              // Pinchos ⚠️ closed Mondays
+  26: {days:[0,1,2,3,4,5,6], open:16,   close:24},              // Xinga Pot ⚠️ opens 4 PM
+  27: {days:[0,1,2,3,4,5,6], open:12,   close:23},              // BBQ Ma Eul
+  28: {days:[0,1,2,3,4,5,6], open:12,   close:23},              // Fujisawa Izakaya
+  29: {days:[0,1,2,3,4,5,6], open:8,    close:22},              // Yeast Bistronomy
+  30: {days:[0,1,2,3,4,5,6], open:18,   close:23},              // KOBU ⚠️ dinner only from 6 PM
+  31: {days:[0,1,2,3,4,5,6], open:12,   close:23},              // Nobu KL
+  32: {days:[0,1,2,3,4,5,6], open:12,   close:23},              // Kikyo
+  33: {days:[0,1,2,3,4,5,6], open:18,   close:23},              // Restaurant Shu ⚠️ dinner only
+  34: {days:[0,1,2,3,4,5,6], open:18,   close:23},              // Langkasuka (dinner-focused)
+  35: {days:[0,1,2,3,4,5,6], open:12,   close:22},              // Bistro Kia Peng
+};
+
+// ─── Reservation info ─────────────────────────────────────────────────────────
+const RESERVATION = {
+  1:  {required:true,  bookUrl:'tel:+60383093254',
+       note:'Call 03-8309 3254 — frequently fully booked, walk-ins often turned away'},
+  7:  {required:false, recommended:true,
+       note:'No reservations taken — arrive before 12 PM or use Qmeter app to queue remotely'},
+  11: {required:false, recommended:true,
+       note:'Walk-in fine for small groups; recommended to call ahead for 6+'},
+  20: {required:false, recommended:true,
+       note:'Call ahead for groups of 5+; private dining available'},
+  24: {required:false, recommended:true,  bookUrl:'https://www.tableandapron.my/food-drink',
+       note:'Walk-ins possible on weekdays; book ahead on Fri–Sun'},
+  25: {required:false, recommended:false},
+  29: {required:false, recommended:true,  bookUrl:'https://yeastgroup.my/bangsar/',
+       note:'Dinner walk-ins possible on weeknights; book for weekends'},
+  30: {required:true,  bookUrl:'https://kobu.com.my/',
+       note:'Reservation mandatory — book at least 3–5 days in advance'},
+  31: {required:true,  bookUrl:'https://www.noburestaurants.com/kualalumpur/',
+       note:'Reservation required — book online or call the restaurant'},
+  32: {required:true,  bookUrl:'https://www.kikyo.com.my/',
+       note:'Reservation strongly recommended — Tatler-awarded, popular'},
+  33: {required:true,  bookUrl:'https://www.restaurantshu.com/',
+       note:'Book ahead — Michelin buzz means it fills up fast'},
+  34: {required:false, recommended:true,  bookUrl:'https://gaiaskl.com/',
+       note:'Book ahead for window seats with KLCC skyline view'},
+};
+
+// ─── Time helpers ─────────────────────────────────────────────────────────────
+function fmtTime(h) {
+  const hour = Math.floor(h), min = Math.round((h - hour) * 60);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const h12 = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+  return min > 0 ? `${h12}:${String(min).padStart(2,'0')} ${ampm}` : `${h12} ${ampm}`;
+}
+
+function getOpenStatus(id) {
+  const h = HOURS[id];
+  if (!h) return {status:'unknown', label:'', pill:''};
+  const now = new Date();
+  const day = now.getDay(), t = now.getHours() + now.getMinutes() / 60;
+
+  if (!h.days.includes(day))
+    return {status:'closed', label:'Closed today',
+      pill:`<span style="background:#fdecea;color:#b71c1c;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">🚫 Closed today</span>`};
+
+  // Table & Apron style: extended hours on certain days
+  let open = h.open;
+  if (h.extDays && h.extDays.includes(day)) open = h.extOpen;
+
+  if (t < open - 0.75)
+    return {status:'not-yet', label:`Opens ${fmtTime(open)}`,
+      pill:`<span style="background:#e3f2fd;color:#1565c0;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">🕐 Opens ${fmtTime(open)}</span>`};
+
+  if (t < open)
+    return {status:'opening-soon', label:`Opens soon — ${fmtTime(open)}`,
+      pill:`<span style="background:#fffde7;color:#b45309;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">🟡 Opens ${fmtTime(open)}</span>`};
+
+  if (t >= h.close)
+    return {status:'closed', label:'Closed now',
+      pill:`<span style="background:#fdecea;color:#b71c1c;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">🚫 Closed now</span>`};
+
+  if (t >= h.close - 0.75)
+    return {status:'closing-soon', label:`Closing at ${fmtTime(h.close)}`,
+      pill:`<span style="background:#fff3e0;color:#c2440a;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">⚠️ Closing ${fmtTime(h.close)}</span>`};
+
+  return {status:'open', label:`Open till ${fmtTime(h.close)}`,
+    pill:`<span style="background:#e8f5e9;color:#2e7d32;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap">✅ Open till ${fmtTime(h.close)}</span>`};
+}
+
+window.moreLikeThis = async function(id) {
+  const r = DB.find(x => x.id === id); if (!r) return;
+  const safeName = r.name.replace(/'/g,"\\'");
+  addMsg(`🔁 More like ${r.name}`, 'user'); qrEl.innerHTML='';
+
+  const subs = getCuisineSubOptions(r);
+  if (subs.length === 1) {
+    await botSay(`Finding more <strong>${subs[0].l}</strong> options for you…`, 550);
+    await runDishSearch(subs[0].v);
+    return;
+  }
+
+  await botSay(`What specifically about <strong>${r.name}</strong> caught your eye?`, 600);
+  setQR(subs.map(opt => ({
+    l: opt.l, v: opt.v,
+    fn: async (v) => {
+      addMsg(opt.l, 'user'); qrEl.innerHTML='';
+      await runDishSearch(v);
+    }
+  })));
+};
+
+// ─── Exclusion handler ────────────────────────────────────────────────────────
+window.excludeRestaurant = async function(id, name) {
+  if (S.excluded.includes(id)) return;
+  S.excluded.push(id);
+  S.last = S.last.filter(r => r.id !== id);
+
+  // Slide-out animation
+  const card = document.getElementById(`rc-${id}`);
+  if (card) {
+    card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(18px)';
+    setTimeout(() => card.remove(), 280);
+  }
+
+  await botSay(`<strong>${name}</strong> removed — finding a replacement with the same criteria… 🔄`, 550);
+
+  // Always find a fresh replacement using the exact same session framework
+  const fresh = getSuggestions().slice(0, 1);
+  if (fresh.length) {
+    S.last = [...S.last, ...fresh];
+    // Track replacement in cross-round history
+    fresh.forEach(r => {
+      if (!S.shown.includes(r.id)) S.shown.push(r.id);
+      const c = r.cuisine.split('/')[0].trim().toLowerCase();
+      if (!S.shownCuisines.includes(c)) S.shownCuisines.push(c);
+    });
+    await new Promise(ok => setTimeout(ok, 350));
+    const isDinner = S.mealType === 'dinner';
+    addCard(buildCard(fresh[0], isDinner));
+    await botSay("New pick added above 👆 — same filters, different spot.", 500);
+  } else {
+    await botSay("No more matches left with your current filters. Try broadening your area or budget, or tap <strong>Start over</strong> for a fresh search.", 600);
+  }
+};
+
+// ─── Scoring ──────────────────────────────────────────────────────────────────
+function score(r) {
+  let s = 0;
+
+  // Meal type match
+  if (S.mealType === 'lunch' && !r.mealTypes.includes('lunch')) return -1;
+  if (S.mealType === 'dinner' && !r.mealTypes.includes('dinner')) return -1;
+
+  // ── Operating hours filter ───────────────────────────────────────────────
+  const openStat = getOpenStatus(r.id);
+  if (openStat.status === 'closed') return -1;
+  if (openStat.status === 'not-yet') {
+    if (S.time === 'rushed') return -1;
+    s -= 6;
+  }
+  if (openStat.status === 'opening-soon') s -= 2;
+  if (openStat.status === 'closing-soon') {
+    if (S.time === 'rushed' || S.time === 'normal') s -= 10;
+    else s -= 4;
+  }
+  if (openStat.status === 'open') s += 2; // verified open bonus
+
+  // ── Reservation filter ───────────────────────────────────────────────────
+  const res = RESERVATION[r.id];
+  if (S.planningAhead === 'now') {
+    if (res && res.required) return -1;        // Can't walk into these
+    if (res && res.recommended) s -= 5;        // Possible walk-in but risky
+  }
+  if (S.planningAhead === 'ahead') {
+    if (res && res.required) s += 5;           // Showcase the best reservation spots
+    if (res && res.bookUrl) s += 2;
+  }
+
+  // Area filter
+  let areaSet = null;
+  if (S.mealType === 'lunch' && S.areaFilter) areaSet = LUNCH_AREA_SETS[S.areaFilter];
+  if (S.mealType === 'dinner' && S.areaFilter) areaSet = DINNER_AREA_SETS[S.areaFilter];
+  if (areaSet && !areaSet.has(r.area)) return -1;
+
+  // Hard dietary stops
+  if (S.dietary.includes('halal') && !r.halal) return -1;
+  if (S.dietary.includes('no-pork') && !r.halal) return -1;
+  if (S.dietary.includes('vegetarian') && !r.veg) return -1;
+  if (S.dietary.includes('vegan') && !r.vegan) return -1;
+  if (S.dietary.includes('no-beef') && !r.noBeef) return -1;
+  // Kosher: no certified Kosher in KL — proxy to vegetarian/vegan as practical alternative
+  if (S.dietary.includes('kosher') && !r.veg && !r.vegan) return -1;
+  // Gluten-free: soft signal (not hard exclude — cross-contamination risk remains; user warned separately)
+  if (S.dietary.includes('gluten-free') && !r.gfFriendly) s -= 10;
+
+  // Group size
+  if (S.groupSize >= 9 && r.capacity === 'small') return -1;
+
+  // Rating bonus
+  if (r.googleRating >= 4.5) s += 10;
+  else if (r.googleRating >= 4.2) s += 6;
+  else if (r.googleRating >= 4.0) s += 2;
+  else s -= 5;
+
+  // Trending bonus
+  s += r.trending.length * 2;
+
+  // Time
+  if (S.time === 'rushed') {
+    if (r.waitPeak === 'slow') return -1;
+    if (r.driveMin) return -1;
+    if (r.walkMin > 12) return -1;
+    if (r.waitPeak === 'fast') s += 8;
+    if (PEAK.level === 'red' && r.waitPeak === 'moderate') s -= 3;
+  }
+  if (S.time === 'normal' && r.waitPeak === 'slow') s -= 4;
+  if (S.time === 'relaxed') s += 2;
+
+  // Budget
+  const budgetCaps = { low:25, mid:S.mealType==='dinner'?100:50, high:S.mealType==='dinner'?200:90, splurge:9999 };
+  if (S.budget === 'low' && r.priceNum > 25) return -1;
+  if (S.budget === 'mid' && r.priceNum > budgetCaps.mid) return -1;
+  if (S.budget === 'high' && r.priceNum > budgetCaps.high) s -= 3;
+  if (S.budget === 'splurge' && r.priceNum > 150) s += 8;
+  if (S.budget === 'low' && r.priceNum <= 15) s += 6;
+
+  // Occasion
+  if (r.bestFor.includes(S.occasion)) s += 8;
+
+  // Craving — match gives a strong boost, mismatch gives a penalty
+  // 'light' uses the healthFriendly flag rather than cuisine keywords
+  if (S.craving === 'light') {
+    if (r.healthy) s += 12;
+    else s -= 8;
+  } else {
+    const cMap = {
+      malaysian:['Malaysian','Kopitiam','Nyonya','Peranakan','Ipoh','Malay'],
+      japanese:['Japanese','Ramen','Mazesoba','Sushi','Omakase','Wagyu','Izakaya'],
+      western:['Western','BBQ','French','American','Spanish','Bistro','Tapas','Café'],
+      chinese:['Chinese','Taiwanese','Dim Sum','Fujian','Hotpot'],
+      korean:['Korean'],
+      latin:['Latin','Peruvian'],
+      bold:['Thai','Korean','Peri-Peri','Nashville','Wagyu','BBQ','Spicy','Hotpot'],
+      any:[],
+    };
+    const keys = cMap[S.craving]||[];
+    if (!keys.length) s += 2; // 'any' — no preference, small nudge
+    else if (keys.some(k => r.cuisine.toLowerCase().includes(k.toLowerCase()))) s += 12;
+    else s -= 10; // Mismatch: doesn't fit the craving at all
+  }
+
+  // Vibe
+  if (S.vibe !== 'any') {
+    if (S.vibe === 'chill' && r.vibe === 'chill') s += 5;
+    if (S.vibe === 'chill' && r.vibe === 'loud') s -= 5;
+    if (S.vibe === 'moderate' && r.vibe !== 'loud') s += 2;
+  }
+
+  // Group
+  if (S.groupSize >= 6 && r.capacity === 'large') s += 4;
+  if (S.groupSize >= 6 && r.capacity === 'small') s -= 5;
+
+  // Peak time penalty
+  if (PEAK.level === 'red' && r.waitPeak === 'slow') s -= 6;
+
+  // Rejection adjustments
+  if (S.rejections.includes('too-far') && r.driveMin > 15) s -= 12;
+  if (S.rejections.includes('too-expensive') && r.priceNum > 50) s -= 10;
+  if (S.rejections.includes('too-noisy') && r.vibe === 'loud') s -= 12;
+  if (S.rejections.includes('too-quiet') && r.vibe === 'chill') s -= 10;
+  if (S.rejections.includes('want-cheaper') && r.priceNum > 30) s -= 10;
+  if (S.rejections.includes('different-cuisine')) {
+    // Use the full cross-round cuisine history, and escalate penalty on repeat requests
+    const diffCount = S.rejections.filter(v => v === 'different-cuisine').length;
+    if (S.shownCuisines.some(c => r.cuisine.toLowerCase().startsWith(c))) {
+      s -= diffCount >= 2 ? 40 : 20;
+    }
+  }
+  // Use accumulated all-time history — prevents restaurants resurfacing after earlier rounds
+  if (S.shown.includes(r.id)) s -= 50;
+  if (S.excluded.includes(r.id)) return -1;
+
+  // Proximity bonus
+  if (r.walkMin && r.walkMin <= 3) s += 5;
+  if (r.driveMin && r.driveMin <= 5) s += 3;
+
+  return s;
+}
+
+function getSuggestions(grabOnly=false) {
+  let pool = grabOnly ? DB.filter(r=>r.grab) : DB;
+  return pool.map(r=>({r,s:score(r)})).filter(x=>x.s>0)
+    .sort((a,b)=>b.s-a.s).slice(0,3).map(x=>x.r);
+}
+
+// ─── Grab delivery UI ─────────────────────────────────────────────────────────
+function buildGrabPanel(restaurants) {
+  const items = restaurants.map(r=>`
+    <div class="rc grab-card" style="margin-bottom:8px">
+      <div class="rc-head grab-head">
+        <div>
+          <div class="rc-name">${r.name}</div>
+          <div style="font-size:10.5px;color:var(--mid);margin-top:2px">${r.cuisine}</div>
+        </div>
+        <div class="rc-r">
+          <div class="rc-price">${r.priceRange}/pax</div>
+          <div class="rc-rating">⭐ ${r.googleRating}</div>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-desc">${r.desc}</div>
+        ${r.deal ? `<div class="rc-deal">🏷️ ${r.deal}</div>` : ''}
+        <div class="pills">
+          <span class="pl h" style="background:#fff5f0;color:#ff5200">🟢 On Grab</span>
+          ${r.halal?'<span class="pl h">✅ Halal</span>':''}
+          ${r.veg?'<span class="pl vb">🥦 Veg options</span>':''}
+        </div>
+      </div>
+    </div>`).join('');
+
+  return `
+    <div class="grab-delivery-box">
+      <h3>🛵 Grab Delivery Picks</h3>
+      <p>These spots deliver to First Avenue PJ. Search them by name in the Grab app for live ETAs and promo codes.</p>
+      <div style="margin:6px 0;display:flex;flex-wrap:wrap;gap:4px">
+        <span class="promo-tag">💰 Check GrabFood promos</span>
+        <span class="promo-tag">🏷️ PayLater discounts</span>
+        <span class="promo-tag">🔁 Grab Unlimited free delivery</span>
+      </div>
+      ${items}
+      <button class="grab-open-btn" onclick="window.open('https://food.grab.com/my/en/','_blank')">Open Grab Food →</button>
+    </div>`;
+}
+
+// ─── Card builder ─────────────────────────────────────────────────────────────
+function buildCard(r, isDinner=false) {
+  const dist = r.walkMin
+    ? `<span class="pl walk">🚶 ${r.walkMin} min walk</span>`
+    : `<span class="pl drive">🚗 ~${r.driveMin} min drive</span>`;
+  const wt = {fast:'⚡ Fast',moderate:'⏱ ~15 min',slow:'🕐 Allow time'};
+  const vb = {chill:'🔇 Chill',moderate:'🎵 Moderate',loud:'🔊 Lively'};
+
+  const badges = r.trending.map(t=>({
+    tiktok:'<span class="sb tiktok">TikTok</span>',
+    instagram:'<span class="sb instagram">Instagram</span>',
+    xhs:'<span class="sb xhs">小红书</span>',
+    klfoodie:'<span class="sb klfoodie">KL Foodie</span>',
+  }[t]||'')).join('');
+
+  const isWarnPeak = PEAK.level==='red' && (r.pt||'').includes('🔴');
+  const ptClass = isWarnPeak ? 'rc-pt warn' : 'rc-pt';
+  const ptText = isWarnPeak
+    ? `⚠️ NOW BUSY: ${(r.pt||'').replace('🔴','').trim()}`
+    : `🕐 ${r.pt||''}`;
+
+  const openStat = getOpenStatus(r.id);
+  const res = RESERVATION[r.id];
+
+  // Reservation banner (walk-in warning OR booking CTA)
+  let resBanner = '';
+  if (S.planningAhead === 'now' && res && res.recommended) {
+    resBanner = `<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:7px;padding:6px 9px;margin-top:7px;font-size:11.5px;color:#7a4f00">
+      ⚠️ <strong>Walk-in risky:</strong> ${res.note}
+    </div>`;
+  }
+  if (S.planningAhead === 'ahead' && res && (res.required || res.recommended)) {
+    const bookBtn = res.bookUrl
+      ? `<a href="${res.bookUrl}" target="_blank" style="display:inline-block;margin-top:5px;font-size:11.5px;font-weight:700;color:#fff;background:#3949ab;padding:4px 12px;border-radius:20px;text-decoration:none">📅 Book a table →</a>`
+      : '';
+    resBanner = `<div style="background:#f0f4ff;border:1px solid #c5cae9;border-radius:7px;padding:6px 9px;margin-top:7px;font-size:11.5px;color:#1a237e">
+      📅 <strong>${res.required ? 'Reservation required' : 'Booking recommended'}:</strong> ${res.note}${bookBtn}
+    </div>`;
+  }
+
+  const menuMeta = getMenuLink(r.id);
+  const menuBtn = menuMeta
+    ? `<a href="${menuMeta.url}" target="_blank" title="${menuMeta.title}" style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:var(--g);text-decoration:none;padding:4px 10px;border:1.5px solid var(--g);border-radius:20px;transition:all .15s" onmouseover="this.style.background='#e6f7ee'" onmouseout="this.style.background='transparent'">${menuMeta.label}</a>`
+    : '';
+  const moreLikeBtn = `<button onclick="moreLikeThis(${r.id})" style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:#b06d00;background:none;border:1.5px solid #e8a020;border-radius:20px;padding:4px 10px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='#fff8ee'" onmouseout="this.style.background='transparent'">🔁 More like this</button>`;
+  const excludeBtn = `<button onclick="excludeRestaurant(${r.id},'${r.name.replace(/'/g,"\\'")}') " style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:#999;background:none;border:1.5px solid #ddd;border-radius:20px;padding:4px 10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#e57373';this.style.color='#e57373'" onmouseout="this.style.borderColor='#ddd';this.style.color='#999'">✕ Exclude</button>`;
+
+  return `
+    <div class="rc" id="rc-${r.id}">
+      <div class="rc-head ${isDinner?'dinner-head':''}">
+        <div>
+          <div class="rc-name">${r.name}</div>
+          ${badges ? `<div class="socrow" style="margin-top:3px">${badges}</div>` : ''}
+        </div>
+        <div class="rc-r">
+          <div class="rc-price">${r.priceRange}/pax</div>
+          <div class="rc-rating">⭐ ${r.googleRating} <span style="font-weight:400;font-size:10px;color:#aaa">(${r.reviews})</span></div>
+          ${openStat.pill ? `<div style="margin-top:3px">${openStat.pill}</div>` : ''}
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-meta">${r.cuisine} · <span class="pl ar" style="display:inline;padding:1px 6px">${r.areaLabel}</span></div>
+        <div class="rc-desc">${r.desc}</div>
+        ${r.deal ? `<div class="rc-deal">🏷️ ${r.deal}</div>` : ''}
+        ${r.pt ? `<div class="${ptClass}">${ptText}</div>` : ''}
+        <div class="pills">
+          ${dist}
+          <span class="pl t">${wt[r.waitPeak]}</span>
+          <span class="pl vb">${vb[r.vibe]}</span>
+          ${r.halal?'<span class="pl h">✅ Halal</span>':''}
+          ${r.grab?'<span class="pl gr">🟢 On Grab</span>':''}
+          ${r.capacity==='large'?'<span class="pl gp">👥 Group-friendly</span>':''}
+        </div>
+        ${resBanner}
+        <div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap">
+          ${menuBtn}
+          ${moreLikeBtn}
+          ${excludeBtn}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─── Dish search card (adds specialty note to standard card) ─────────────────
+function buildDishCard(r, specialtyNote) {
+  const base = buildCard(r, r.mealTypes && !r.mealTypes.includes('lunch'));
+  const highlight = `
+    <div style="background:#fffbe6;border:1.5px solid #f0c040;border-radius:8px;padding:7px 10px;margin:6px 0 2px;font-size:12px;line-height:1.5">
+      <span style="font-weight:700;color:#b7860a">🏆 Known for this dish:</span><br>
+      <span style="color:#555">${specialtyNote}</span>
+    </div>`;
+  return base.replace('</div>\n    </div>', `${highlight}</div>\n    </div>`);
+}
+
+async function runDishSearch(query) {
+  const match = matchDish(query);
+  if (!match) {
+    await botSay(`I don't have a specific match for <strong>"${query}"</strong> yet — but let me find the closest options based on cuisine. You can also try a broader term like the cuisine type.`, 700);
+    // Fallback to normal suggest
+    await showResults();
+    return;
+  }
+
+  const validIds = match.matches.map(m => m.id);
+  const candidates = DB.filter(r => validIds.includes(r.id));
+
+  if (!candidates.length) {
+    await botSay(`I know of places for <strong>${query}</strong> but they might not match your current filters (area / dietary). Try broadening your area preference.`, 700);
+    await showFeedback(); return;
+  }
+
+  S.step = 'result';
+  S.last = candidates;
+
+  await botSay(`Found <strong>${candidates.length}</strong> restaurant${candidates.length > 1 ? 's' : ''} specifically known for <strong>${query}</strong> 👇`, 700);
+
+  for (const r of candidates) {
+    await new Promise(ok => setTimeout(ok, 350));
+    const note = match.matches.find(m => m.id === r.id)?.note || '';
+    addCard(buildDishCard(r, note));
+  }
+
+  await botSay("These spots are specifically known for that dish. Happy with the options?", 700);
+  await showFeedback();
+}
+
+// ─── Chat engine ──────────────────────────────────────────────────────────────
+const chatEl=document.getElementById('chat'), qrEl=document.getElementById('qr'), inpEl=document.getElementById('inp');
+
+function addMsg(html,who,cls='') {
+  const row=document.createElement('div'); row.className=`row ${who}`;
+  const bubCls = who==='bot' ? `bub bot ${cls}` : 'bub user';
+  if(who==='bot') row.innerHTML=`<div class="bicon">🍽️</div><div class="${bubCls}">${html}</div>`;
+  else row.innerHTML=`<div class="${bubCls}">${html}</div>`;
+  chatEl.appendChild(row); scroll();
+}
+function addCard(html) {
+  const row=document.createElement('div'); row.className='row bot';
+  row.innerHTML=`<div class="bicon">🍽️</div><div style="max-width:92%;flex:1">${html}</div>`;
+  chatEl.appendChild(row); scroll();
+}
+function showTyping(){
+  const t=document.createElement('div'); t.className='typing'; t.id='typing';
+  t.innerHTML=`<div class="bicon">🍽️</div><div class="tdots"><span></span><span></span><span></span></div>`;
+  chatEl.appendChild(t); scroll();
+}
+function killTyping(){const t=document.getElementById('typing'); if(t)t.remove();}
+function scroll(){setTimeout(()=>chatEl.scrollTop=chatEl.scrollHeight,60);}
+
+function setQR(items,grabStyle=false) {
+  qrEl.innerHTML='';
+  items.forEach(item=>{
+    const b=document.createElement('button');
+    b.className='qb'+(grabStyle||item.grab?' grab-qb':'');
+    b.textContent=item.l;
+    b.onclick=()=>item.fn ? item.fn(item.v) : onQR(item.l,item.v);
+    qrEl.appendChild(b);
+  });
+}
+
+function botSay(html,delay=650,cls='') {
+  return new Promise(res=>{showTyping();setTimeout(()=>{killTyping();addMsg(html,'bot',cls);res();},delay);});
+}
+
+// ─── Flow ─────────────────────────────────────────────────────────────────────
+const ORDER_COMMON = ['groupSize','time','dietary','craving','budget','vibe'];
+
+async function onQR(label,value) {
+  // Multi-select dietary
+  if (S.step==='dietary' && value!=='none') {
+    if(!S.dietary.includes(value)) S.dietary.push(value);
+    addMsg(label,'user'); qrEl.innerHTML='';
+    if (value === 'kosher') {
+      await botSay("Noted. Heads up: <strong>certified Kosher restaurants are extremely rare in Klang Valley</strong> — there are essentially none. We'll surface strictly vegetarian and vegan-friendly options as the most practical alternative. Please confirm with your guest what they're comfortable with. 🙏", 700);
+    } else if (value === 'gluten-free') {
+      await botSay("⚠️ <strong>Gluten hides in many Malaysian dishes</strong> — soy sauce, oyster sauce, wheat noodles, and marinades are everywhere. We'll prioritise the safest options, but please always confirm with the restaurant. Cross-contamination is a real risk in shared kitchens.", 700);
+    } else {
+      await botSay("Noted! Any other dietary needs?", 400);
+    }
+    setQR([
+      {l:"✅ Halal required",v:"halal"},{l:"🌱 Vegan",v:"vegan"},
+      {l:"🥦 Vegetarian",v:"vegetarian"},{l:"🚫 No pork/No lard",v:"no-pork"},
+      {l:"🥩 No beef",v:"no-beef"},{l:"🌾 Gluten-free",v:"gluten-free"},
+      {l:"✡️ Kosher",v:"kosher"},{l:"✅ That's all, continue",v:"none"},
+    ]); return;
+  }
+
+  // Dish search branch
+  if (value === 'dish-search') {
+    addMsg(label,'user'); qrEl.innerHTML='';
+    S.step = 'dish-search';
+    await botSay(`What dish are you after? Type it in and I'll find who does it best. 👇<br><small style="color:#9aa">e.g. nasi lemak, ramen, XLB, wagyu, ribs, laksa, mazesoba…</small>`, 600);
+    inpEl.placeholder = 'Type a dish name and press Enter…';
+    inpEl.focus();
+    return;
+  }
+
+  addMsg(label,'user'); qrEl.innerHTML='';
+  S[S.step] = S.step==='groupSize' ? parseInt(value) : value;
+  await advance();
+}
+
+async function advance() {
+  const cur = S.step;
+
+  if (cur==='occasion') { S.step='mealType'; await askMealType(); return; }
+  if (cur==='mealType') {
+    if (S.mealType==='grab-delivery') { S.step='grab-dietary'; await askGrabFlow(); return; }
+    S.step='walkInOrPlan'; await askWalkIn(); return;
+  }
+  if (cur==='walkInOrPlan') { S.step='areaPreference'; await askAreaPref(); return; }
+  if (cur==='areaPreference') { S.step='groupSize'; await askStep('groupSize'); return; }
+
+  // Grab sub-flow
+  if (cur==='grab-dietary') { S.step='grab-craving'; await askGrabCraving(); return; }
+  if (cur==='grab-craving') { S.step='grab-budget'; await askGrabBudget(); return; }
+  if (cur==='grab-budget') { await showGrabResults(); return; }
+
+  // Common steps
+  const idx = ORDER_COMMON.indexOf(cur);
+  if (idx === -1 || idx === ORDER_COMMON.length-1) { await showResults(); return; }
+  S.step = ORDER_COMMON[idx+1];
+  await askStep(S.step);
+}
+
+const STEP_MSGS = {
+  groupSize:{msg:"How many people are we feeding?",qr:[{l:"Just me",v:"1"},{l:"2–4 pax",v:"3"},{l:"5–8 pax",v:"6"},{l:"9+ pax",v:"10"}]},
+  time:{msg:"How much time do you have?",qr:[{l:"⚡ Rushed (under 30 min)",v:"rushed"},{l:"🕐 Normal (~1 hour)",v:"normal"},{l:"😌 Relaxed (1.5 hr+)",v:"relaxed"}]},
+  dietary:{msg:"Any dietary requirements? (Tap all that apply)",qr:[{l:"✅ Halal required",v:"halal"},{l:"🌱 Vegan",v:"vegan"},{l:"🥦 Vegetarian",v:"vegetarian"},{l:"🚫 No pork / No lard",v:"no-pork"},{l:"🥩 No beef",v:"no-beef"},{l:"🌾 Gluten-free",v:"gluten-free"},{l:"✡️ Kosher",v:"kosher"},{l:"✅ No restrictions",v:"none"}]},
+  craving:{
+    lunch:{msg:"What are you craving?",qr:[{l:"🇲🇾 Malaysian local",v:"malaysian"},{l:"🍜 Japanese",v:"japanese"},{l:"🥩 Western / Grilled",v:"western"},{l:"🥟 Chinese / Dim Sum",v:"chinese"},{l:"🌶️ Bold & flavourful",v:"bold"},{l:"🥗 Healthy / Low-cal",v:"light"},{l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"}]},
+    dinner:{msg:"What kind of dinner are you after?",qr:[{l:"🇲🇾 Malaysian / Asian",v:"malaysian"},{l:"🍣 Japanese / Omakase",v:"japanese"},{l:"🥩 Western / French",v:"western"},{l:"🫕 Hotpot / BBQ",v:"bold"},{l:"🌶️ Thai / Korean",v:"korean"},{l:"🥗 Healthy / Light",v:"light"},{l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"}]},
+  },
+  budget:{
+    lunch:{msg:"Budget per person?",qr:[{l:"💰 Under RM20",v:"low"},{l:"💳 RM20–50",v:"mid"},{l:"💎 RM50+",v:"high"}]},
+    dinner:{msg:"Budget per person for dinner?",qr:[{l:"💳 RM50–100 (casual)",v:"mid"},{l:"💎 RM100–200 (premium)",v:"high"},{l:"👑 RM200+ (celebration!)",v:"splurge"}]},
+  },
+  vibe:{msg:"What kind of environment?",qr:[{l:"🔇 Quiet — easy to talk",v:"chill"},{l:"🎵 Some buzz is fine",v:"moderate"},{l:"🔊 Lively, don't care",v:"any"}]},
+};
+
+async function askStep(step) {
+  let cfg = STEP_MSGS[step];
+  if (step==='craving') cfg = S.mealType==='dinner' ? cfg.dinner : cfg.lunch;
+  if (step==='budget') cfg = S.mealType==='dinner' ? cfg.dinner : cfg.lunch;
+  await botSay(cfg.msg,650);
+  setQR(cfg.qr);
+}
+
+async function askMealType() {
+  await botSay("Is this for lunch, dinner, or do you want to order delivery via Grab?", 650);
+  const mealTabsEl = document.createElement('div');
+  mealTabsEl.className='meal-tabs';
+  mealTabsEl.innerHTML=`
+    <button class="mt-btn" onclick="pickMeal('lunch')">
+      <span class="mt-icon">☀️</span>
+      <span class="mt-label">Lunch</span>
+      <span class="mt-sub">Walk-in / drive nearby</span>
+    </button>
+    <button class="mt-btn" onclick="pickMeal('dinner')">
+      <span class="mt-icon">🌙</span>
+      <span class="mt-label">Dinner</span>
+      <span class="mt-sub">Wider KL Valley options</span>
+    </button>
+    <button class="mt-btn grab" onclick="pickMeal('grab-delivery')">
+      <span class="mt-icon">🛵</span>
+      <span class="mt-label">Grab Delivery</span>
+      <span class="mt-sub">Order to your desk</span>
+    </button>`;
+  qrEl.appendChild(mealTabsEl);
+}
+
+window.pickMeal = async function(val) {
+  const labels = {'lunch':'☀️ Lunch — dine in','dinner':'🌙 Dinner — dine in','grab-delivery':'🛵 Grab Delivery'};
+  addMsg(labels[val],'user'); qrEl.innerHTML='';
+  S.mealType = val; S.step = 'mealType';
+  await advance();
+};
+
+async function askWalkIn() {
+  const nowOpen = DB.filter(r => {
+    const s = getOpenStatus(r.id);
+    return s.status === 'closed' || s.status === 'not-yet';
+  }).length;
+
+  await botSay(`Are you heading out soon, or planning ahead?${nowOpen > 0 ? `<br><small style="color:#9aa">ℹ️ ${nowOpen} spots are currently closed or not yet open — I'll filter those automatically.</small>` : ''}`, 650);
+  setQR([
+    {l:'🚀 Heading there soon — walk-in', v:'now', fn: async () => {
+      addMsg('🚀 Walk-in — heading there soon','user'); qrEl.innerHTML='';
+      S.planningAhead='now'; S.step='walkInOrPlan'; await advance();
+    }},
+    {l:'📅 Planning ahead / making a booking', v:'ahead', fn: async () => {
+      addMsg('📅 Planning ahead','user'); qrEl.innerHTML='';
+      S.planningAhead='ahead'; S.step='walkInOrPlan'; await advance();
+    }},
+  ]);
+}
+
+async function askAreaPref() {
+  if (S.mealType==='lunch') {
+    await botSay("Any area preference? (You can avoid One Utama if you want something different 😄)", 650);
+    setQR([
+      {l:"🏬 One Utama / First Avenue",v:"one-utama-only",fn:pickArea},
+      {l:"🚗 Nearby streets (avoid 1U)",v:"avoid-one-utama",fn:pickArea},
+      {l:"🗺️ Either — show me the best",v:"any-nearby",fn:pickArea},
+    ]);
+  } else {
+    await botSay("How far are you willing to go for dinner?", 650);
+    setQR([
+      {l:"🏘️ Stay nearby PJ / Uptown / TTDI",v:"pj-nearby",fn:pickArea},
+      {l:"🌆 Open to Bangsar / KL",v:"mid-kl",fn:pickArea},
+      {l:"🌃 Anywhere in KL Valley",v:"anywhere",fn:pickArea},
+    ]);
+  }
+}
+
+window.pickArea = async function(val) {
+  const labels = {
+    'one-utama-only':'🏬 One Utama / First Avenue',
+    'avoid-one-utama':'🚗 Nearby streets (no 1U)',
+    'any-nearby':'🗺️ Any nearby area',
+    'pj-nearby':'🏘️ Staying nearby PJ',
+    'mid-kl':'🌆 Bangsar / KL area',
+    'anywhere':'🌃 Anywhere in KL Valley',
+  };
+  addMsg(labels[val]||val,'user'); qrEl.innerHTML='';
+  S.areaFilter = val; S.step = 'areaPreference';
+  await advance();
+};
+
+// ─── Grab sub-flow ────────────────────────────────────────────────────────────
+async function askGrabFlow() {
+  await botSay("Delivering to First Avenue PJ. Any dietary needs?", 650);
+  setQR([
+    {l:"✅ Halal only",v:"halal",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+    {l:"🌱 Vegan",v:"vegan",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+    {l:"🥦 Vegetarian",v:"vegetarian",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+    {l:"🥩 No beef",v:"no-beef",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+    {l:"No restrictions",v:"none",fn:v=>{S.step='grab-dietary';advance();}},
+  ], true);
+}
+async function askGrabCraving() {
+  await botSay("What are you craving?", 500);
+  setQR([
+    {l:"🇲🇾 Malaysian",v:"malaysian"},{l:"🍜 Japanese",v:"japanese"},
+    {l:"🥩 Western",v:"western"},{l:"🌶️ Bold & flavourful",v:"bold"},
+    {l:"✨ Surprise me",v:"any"},
+  ], true);
+}
+async function askGrabBudget() {
+  await botSay("Budget per order?", 500);
+  setQR([
+    {l:"💰 Under RM20",v:"low"},{l:"💳 RM20–40",v:"mid"},{l:"💎 RM40+",v:"high"},
+  ], true);
+}
+
+async function showGrabResults() {
+  const res = getSuggestions(true);
+  S.last = res;
+  res.forEach(r => {
+    if (!S.shown.includes(r.id)) S.shown.push(r.id);
+    const c = r.cuisine.split('/')[0].trim().toLowerCase();
+    if (!S.shownCuisines.includes(c)) S.shownCuisines.push(c);
+  });
+  if (!res.length) {
+    await botSay("I couldn't find a Grab match with those filters. Let me broaden — relaxing dietary filter slightly.", 700);
+  }
+  await botSay("Here are your best Grab delivery picks 🛵 Search these in the Grab app for live ETA and promos:", 700);
+  addCard(buildGrabPanel(res));
+  await botSay("Open Grab Food, search by restaurant name, and check for any active promo codes under the checkout screen.", 800);
+  await showFeedback();
+}
+
+// ─── Show results ─────────────────────────────────────────────────────────────
+async function showResults() {
+  S.step = 'result';
+  const isDinner = S.mealType==='dinner';
+  const res = getSuggestions();
+  S.last = res;
+  // Accumulate cross-round history so scores stay penalised across all rounds
+  res.forEach(r => {
+    if (!S.shown.includes(r.id)) S.shown.push(r.id);
+    const c = r.cuisine.split('/')[0].trim().toLowerCase();
+    if (!S.shownCuisines.includes(c)) S.shownCuisines.push(c);
+  });
+
+  if (!res.length) {
+    const exhausted = S.shown.length > 0;
+    await botSay(exhausted
+      ? "We've surfaced all the strong matches for your criteria — nothing genuinely new left. Try relaxing a filter or tap <strong>Start over</strong> for a fresh search."
+      : "Hmm, nothing matched well with all those filters — let me adjust.", 700);
+    await showFeedback(); return;
+  }
+
+  const occLabel = {'overseas-guests':'for your guests','team-outing':'for the team','daily-lunch':'for you today'}[S.occasion]||'';
+  await botSay(`Here are my top picks ${occLabel} — all <strong>⭐ 4.0+ rated on Google</strong> ${isDinner?'🌙':'☀️'}`, 700);
+
+  if (PEAK.level !== 'green') {
+    await botSay(`<strong>${PEAK.label}</strong> — ${PEAK.note}`, 450);
+  }
+
+  for (const r of res) {
+    await new Promise(ok=>setTimeout(ok,350));
+    addCard(buildCard(r, isDinner));
+  }
+
+  await botSay("What do you think? Hit the spot?", 700);
+  await showFeedback();
+}
+
+async function showFeedback() {
+  S.step='feedback';
+  setQR([
+    {l:"✅ Perfect, thanks!",v:"happy",fn:onFeedback},
+    {l:"🔍 Search a different dish",v:"dish-search-again",fn:onFeedback},
+    {l:"📍 Too far away",v:"too-far",fn:onFeedback},
+    {l:"💸 Too expensive",v:"too-expensive",fn:onFeedback},
+    {l:"🔊 Too noisy",v:"too-noisy",fn:onFeedback},
+    {l:"🔇 Too quiet",v:"too-quiet",fn:onFeedback},
+    {l:"🍽️ Different cuisine",v:"different-cuisine",fn:onFeedback},
+    {l:"💰 Something cheaper",v:"want-cheaper",fn:onFeedback},
+    {l:"🔄 Start over",v:"reset",fn:onFeedback},
+  ]);
+}
+
+async function onFeedback(value) {
+  if (value==='dish-search-again') {
+    addMsg('🔍 Search a different dish','user'); qrEl.innerHTML='';
+    S.step = 'dish-search';
+    await botSay(`What dish are you looking for this time? 👇<br><small style="color:#9aa">e.g. ramen, XLB, wagyu, ribs, laksa…</small>`, 500);
+    inpEl.placeholder = 'Type a dish name and press Enter…';
+    inpEl.focus(); return;
+  }
+  if (value==='happy') {
+    await botSay("Enjoy! 🙌 Come back anytime for your next food fix.", 600);
+    const w=document.createElement('div'); w.className='reset-wrap';
+    w.innerHTML=`<button class="reset-btn" onclick="resetChat()">🔄 Find food again</button>`;
+    chatEl.appendChild(w); scroll(); return;
+  }
+  if (value==='reset') { resetChat(); return; }
+  S.rejections.push(value);
+  const msgs={
+    'too-far':'Keeping it closer this time.',
+    'too-expensive':'Looking for better value.',
+    'too-noisy':'Finding somewhere quieter.',
+    'too-quiet':'Finding somewhere with more energy.',
+    'different-cuisine':'Switching cuisine direction.',
+    'want-cheaper':'Going budget-friendly.',
+  };
+  await botSay(msgs[value]||"Let me re-think.", 600);
+  if (S.mealType==='grab-delivery') await showGrabResults();
+  else await showResults();
+}
+
+// ─── Text input ───────────────────────────────────────────────────────────────
+function handleSend() {
+  const v=inpEl.value.trim(); if(!v) return; inpEl.value='';
+  inpEl.placeholder = 'Type a message or pick above…';
+
+  // Dish search input
+  if (S.step === 'dish-search') {
+    addMsg(`🔍 "${v}"`, 'user'); qrEl.innerHTML='';
+    runDishSearch(v); return;
+  }
+
+  addMsg(v,'user'); qrEl.innerHTML='';
+  const lv=v.toLowerCase();
+  if (S.step==='feedback') {
+    let val='different-cuisine';
+    if(lv.match(/far|walk|close|near/))val='too-far';
+    else if(lv.match(/expens|pric|cheap/))val='too-expensive';
+    else if(lv.match(/nois|loud/))val='too-noisy';
+    else if(lv.match(/quiet|boring|dead/))val='too-quiet';
+    else if(lv.match(/good|great|perfect|thanks|yes|ok/))val='happy';
+    else if(lv.match(/reset|start|again/))val='reset';
+    else if(lv.match(/cheap|budget|less money/))val='want-cheaper';
+    onFeedback(val); return;
+  }
+  botSay("Use the buttons for best results! Let me re-show the options:",500)
+    .then(()=>{ if(STEP_MSGS[S.step]) askStep(S.step); });
+}
+inpEl.addEventListener('keydown',e=>{ if(e.key==='Enter') handleSend(); });
+
+// ─── Reset & init ─────────────────────────────────────────────────────────────
+function resetChat() {
+  S={step:'occasion',occasion:null,mealType:null,planningAhead:null,areaFilter:null,groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]};
+  chatEl.innerHTML=''; qrEl.innerHTML=''; startChat();
+}
+
+async function startChat() {
+  const hooks = [
+    `Stomach growling. Group chat stuck at <em>"anything la"</em>. Clock ticking. 😅<br><br>Skip the debate — tell me what's going on and I'll have a suggestion ready before the next message.`,
+    `7 people. 7 opinions. Zero decisions. Been there. 😄<br><br>Tell me what you need and I'll cut straight to the answer.`,
+    `The best spot for your situation isn't always the obvious one. Good thing I know the difference. 😏`,
+    `The food's great in this area — the trick is knowing <em>which</em> great. Let me help with that.`,
+  ];
+  const hook = hooks[new Date().getDay() % hooks.length];
+  await botSay(`${hook}<br><br>${PEAK.level!=='green'?`<span style="font-weight:600">${PEAK.label}</span> — ${PEAK.note}<br><br>`:''}What's the occasion today?`, 700);
+  S.step='occasion';
+  setQR([
+    {l:"🌍 Hosting overseas guests",v:"overseas-guests"},
+    {l:"👥 Team lunch / outing",v:"team-outing"},
+    {l:"🍜 Personal lunch / dinner",v:"daily-lunch"},
+  ]);
+}
+
+startChat();
+</script>
+</body>
+</html>
