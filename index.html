@@ -96,6 +96,11 @@
     .pl.dl{background:#fffde7;color:#f57f17}
     .pl.ar{background:#f0f4ff;color:#3949ab}
 
+    /* ── Why this pick ── */
+    .why-picks{margin-top:8px;padding:6px 10px;background:#f6fdf9;border-left:3px solid var(--g);border-radius:0 6px 6px 0}
+    .why-label{font-size:10px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+    .why-tag{font-size:11px;font-weight:600;color:#1a5c3a;background:#e3f4ec;padding:2px 9px;border-radius:20px;display:inline-block;margin:2px 3px 2px 0}
+
     /* ── Social badges ── */
     .socrow{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
     .sb{font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px}
@@ -103,6 +108,21 @@
     .sb.instagram{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff}
     .sb.xhs{background:#ff2442;color:#fff}
     .sb.klfoodie{background:#ff6b00;color:#fff}
+    .sb.wongnai{background:#6c3483;color:#fff}
+    .sb.lemon8{background:#e8b600;color:#1a1a1a}
+    .sb.bkmagazine{background:#1a4a6b;color:#fff}
+    .sb.hungryhub{background:#FF4D00;color:#fff}
+    .pl.bts{background:#1a237e;color:#fff}
+
+    /* ── City selector ── */
+    .city-tabs{display:flex;flex-direction:column;gap:8px;margin:8px 0 4px}
+    .city-btn{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #ddd;border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;width:100%;transition:all .15s}
+    .city-btn:hover:not(.coming-soon){border-color:var(--g);background:#f6fdf9}
+    .city-btn.coming-soon{opacity:.5;cursor:default}
+    .city-flag{font-size:26px;line-height:1}
+    .city-info{display:flex;flex-direction:column;gap:2px;flex:1}
+    .city-name{font-weight:700;font-size:14px;color:var(--text)}
+    .city-sub{font-size:11px;color:var(--mid)}
 
     /* ── Grab delivery card ── */
     .grab-delivery-box{background:#fff8f5;border:2px solid #ff5200;border-radius:14px;padding:14px;margin-top:6px}
@@ -490,6 +510,241 @@ const DB = [
    trending:["instagram"]},
 ];
 
+// ════ THAILAND — The PARQ, Bangkok (Ratchadaphisek Rd, Khlong Toei) ════════════
+// Exclude: All restaurants inside The PARQ building itself
+// areas: asoke | one-bangkok | lumpini | silom | sathorn | ploenchit | phrom-phong
+//         thonglor | ekamai | siam | nana | riverside | icon-siam | asiatique | rama4
+const DB_TH = [
+  // ── LUNCH: Walkable or BTS/MRT from The PARQ ─────────────────────────────────
+  {id:36,city:'thailand',name:"Pier 21 Food Court",loc:"Terminal 21 Asoke, 4th Floor, 88 Sukhumvit 19",
+   area:"asoke",areaLabel:"Terminal 21 Asoke",cuisine:"Thai Food Court",
+   transit:"BTS Asoke / MRT Sukhumvit — 15 min walk",walkMin:15,driveMin:null,
+   priceRange:"฿60–150",priceNum:100,googleRating:4.3,reviews:"5,000+",
+   vibe:"loud",capacity:"large",waitPeak:"fast",halal:true,veg:true,grab:false,
+   bestFor:["daily-lunch","team-outing"],mealTypes:["lunch"],
+   desc:"Bangkok's most popular food court — fast, cheap, massive variety. Pad thai, khao man gai, Japanese ramen, Korean fried chicken all in one floor. Best for mixed groups on a budget.",
+   pt:"🔴 Very busy 12–1:30 PM but rapid turnover",deal:"Cash or QR code only at most stalls",
+   trending:["wongnai","google"]},
+
+  {id:37,city:'thailand',name:"Nara Thai Cuisine",loc:"Terminal 21 Asoke, M Floor",
+   area:"asoke",areaLabel:"Terminal 21 Asoke",cuisine:"Thai",
+   transit:"BTS Asoke / MRT Sukhumvit",walkMin:15,driveMin:null,
+   priceRange:"฿200–450",priceNum:300,googleRating:4.3,reviews:"2,500+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"Polished, guest-friendly Thai. English menu with dish explanations, air-con comfort, consistent quality. Tom kha, pad thai, massaman curry — the full Thai greatest hits. Good for first-timers.",
+   pt:"Queue at 12–1 PM peak",deal:null,trending:["wongnai","bkmagazine"]},
+
+  {id:38,city:'thailand',name:"Greyhound Café",loc:"Terminal 21 Asoke / EmQuartier",
+   area:"asoke",areaLabel:"Asoke",cuisine:"Thai-Western Fusion Café",
+   transit:"BTS Asoke",walkMin:15,driveMin:null,
+   priceRange:"฿200–500",priceNum:320,googleRating:4.2,reviews:"3,000+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:true,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch"],
+   desc:"Bangkok's iconic lifestyle café — famous for the Mother Pasta and creative Thai-Western fusion. Beautiful interiors, strong coffee, consistently good. A safe crowd-pleaser for creative teams or guest meals.",
+   pt:"Busy 12–2 PM weekdays",deal:null,trending:["wongnai","lemon8","bkmagazine"]},
+
+  {id:39,city:'thailand',name:"S&P Restaurant",loc:"Terminal 21 Asoke / Multiple",
+   area:"asoke",areaLabel:"Asoke",cuisine:"Thai / Bakery",
+   transit:"BTS Asoke",walkMin:15,driveMin:null,
+   priceRange:"฿80–200",priceNum:140,googleRating:4.1,reviews:"1,500+",
+   vibe:"moderate",capacity:"medium",waitPeak:"fast",halal:false,veg:true,grab:true,
+   bestFor:["daily-lunch"],mealTypes:["lunch"],
+   desc:"Thailand's most reliable Thai chain — consistent, quick, affordable. Rice dishes, noodles, soups. The bakery section is popular for takeaway treats. Multiple locations near The PARQ.",
+   pt:"Fast service even at lunch peak",deal:"Weekday set meals available",
+   trending:["wongnai"]},
+
+  {id:40,city:'thailand',name:"Somtum Der",loc:"Sala Daeng Soi 1, Silom / also Ekamai",
+   area:"silom",areaLabel:"Silom / Sala Daeng",cuisine:"Northeastern Thai (E-sarn / Isaan)",
+   transit:"BTS Sala Daeng",walkMin:null,driveMin:15,
+   priceRange:"฿150–350",priceNum:220,googleRating:4.4,reviews:"3,500+",
+   vibe:"moderate",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch","dinner"],
+   desc:"Michelin Bib Gourmand Isaan — the benchmark for E-sarn in Bangkok. Som tam papaya salad in 20+ variations, gai yang grilled chicken, larb, sticky rice. Also has vegetarian papaya salad. A genuine Thai food institution.",
+   pt:"Queue 12–1:30 PM — arrive early or after 1:45 PM",deal:"Michelin Bib Gourmand",
+   trending:["wongnai","bkmagazine","google"]},
+
+  {id:41,city:'thailand',name:"Bonchon Chicken",loc:"Terminal 21 Asoke, 2nd Floor",
+   area:"asoke",areaLabel:"Terminal 21 Asoke",cuisine:"Korean Fried Chicken",
+   transit:"BTS Asoke",walkMin:15,driveMin:null,
+   priceRange:"฿200–380",priceNum:270,googleRating:4.2,reviews:"900+",
+   vibe:"moderate",capacity:"medium",waitPeak:"moderate",halal:false,veg:false,grab:true,
+   bestFor:["daily-lunch","team-outing"],mealTypes:["lunch"],
+   desc:"Crispy double-fried Korean fried chicken — soy garlic and spicy are the must-orders. A crowd favourite with Korean food fans. Satisfying and fun for team lunches.",
+   pt:"Moderate wait at lunch peak",deal:null,trending:["wongnai","lemon8"]},
+
+  {id:42,city:'thailand',name:"One Bangkok Food Atrium",loc:"One Bangkok, Wireless Road, Pathumwan",
+   area:"one-bangkok",areaLabel:"One Bangkok",cuisine:"Premium Food Hall",
+   transit:"BTS Ploen Chit (10 min walk) or 5 min drive",walkMin:20,driveMin:5,
+   priceRange:"฿180–600",priceNum:360,googleRating:4.5,reviews:"1,500+",
+   vibe:"chill",capacity:"large",waitPeak:"moderate",halal:true,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch","dinner"],
+   desc:"Bangkok's newest landmark food hall — a curated mix of top Thai and international concepts with Lumpini Park views. Walking distance from The PARQ. Beautiful space, wide dietary options, great for mixed groups.",
+   pt:"Less crowded on weekdays — ideal for unhurried team lunches",deal:null,
+   trending:["lemon8","bkmagazine","google"]},
+
+  {id:43,city:'thailand',name:"Lumpini Park Hawker Area",loc:"Lumpini Park surrounds, Rama 4 Rd",
+   area:"lumpini",areaLabel:"Lumpini Park",cuisine:"Thai Street Food",
+   transit:"MRT Lumpini or MRT Silom",walkMin:20,driveMin:7,
+   priceRange:"฿40–120",priceNum:80,googleRating:4.1,reviews:"600+",
+   vibe:"loud",capacity:"large",waitPeak:"fast",halal:false,veg:true,grab:false,
+   bestFor:["daily-lunch","team-outing"],mealTypes:["lunch"],
+   desc:"Authentic Bangkok street food experience — grilled pork rice, boat noodles, fresh coconut, pad kra pao. Very affordable and genuinely local. A team favourite for those who want the real deal, not the tourist version.",
+   pt:"Best 11 AM–1 PM. Most stalls close by 3 PM.",deal:null,trending:["google"]},
+
+  {id:44,city:'thailand',name:"Suda Thai Restaurant",loc:"11/1 Sukhumvit Soi 14, Khlong Toei Nuea",
+   area:"asoke",areaLabel:"Sukhumvit Soi 14",cuisine:"Thai",
+   transit:"BTS Asoke (7 min walk)",walkMin:20,driveMin:null,
+   priceRange:"฿120–280",priceNum:180,googleRating:4.3,reviews:"3,200+",
+   vibe:"moderate",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:true,
+   bestFor:["overseas-guests","daily-lunch","team-outing"],mealTypes:["lunch","dinner"],
+   desc:"A beloved expat institution on Soi 14 — consistent, generous Thai food at fair prices for 20+ years. Best pad see ew, tom yum, green curry in the area. Reliable every day. English menu available.",
+   pt:"Busy with office workers 12–1:30 PM",deal:null,trending:["wongnai","google"]},
+
+  // ── DINNER: Wider Bangkok ─────────────────────────────────────────────────────
+  {id:45,city:'thailand',name:"Supanniga Eating Room",loc:"Sukhumvit Soi 61, Thonglor",
+   area:"thonglor",areaLabel:"Thonglor",cuisine:"Thai (Traditional, Elevated)",
+   transit:"BTS Thong Lo (10 min cab)",walkMin:null,driveMin:22,
+   priceRange:"฿400–800",priceNum:560,googleRating:4.5,reviews:"4,500+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Bangkok's most beloved elevated Thai — grandmother's recipes made refined. Gaeng Keow Wan, Pad Cha, Choo Chee Salmon. Consistently praised by food writers and expats. Warm, intimate atmosphere that feels genuinely Thai.",
+   pt:"Book ahead on weekends — fills up fast",deal:null,
+   trending:["wongnai","bkmagazine","google"]},
+
+  {id:46,city:'thailand',name:"Paste Bangkok",loc:"Gaysorn Village, 999 Ploenchit Rd",
+   area:"ploenchit",areaLabel:"Gaysorn / Chidlom",cuisine:"Royal Thai Cuisine",
+   transit:"BTS Chidlom",walkMin:null,driveMin:20,
+   priceRange:"฿800–1,800",priceNum:1200,googleRating:4.5,reviews:"900+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests"],mealTypes:["dinner"],
+   desc:"Award-winning Royal Thai using ancient recipes and rare herbs. Michelin Guide recommended. The finest showcase of authentic elevated Thai cuisine — exceptional for VIP guests or significant dining occasions.",
+   pt:"Reservations strongly recommended",deal:"Michelin Guide recommended",
+   trending:["wongnai","bkmagazine"]},
+
+  {id:47,city:'thailand',name:"Le Du",loc:"Silom Soi 7, Bang Rak",
+   area:"silom",areaLabel:"Silom",cuisine:"Modern Thai (Michelin Starred)",
+   transit:"BTS Surasak or BTS Sala Daeng",walkMin:null,driveMin:18,
+   priceRange:"฿1,500–2,800",priceNum:2000,googleRating:4.7,reviews:"1,400+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:false,veg:false,grab:false,
+   bestFor:["overseas-guests"],mealTypes:["dinner"],
+   desc:"One of Asia's 50 Best — Michelin-starred modern Thai using seasonal Thai ingredients with classical French technique. Chef Thitid is a culinary icon. The definitive apex for impressing international guests.",
+   pt:"Reservation essential — book 2–3 weeks ahead",deal:"Asia's 50 Best · Michelin Star",
+   trending:["wongnai","bkmagazine","google"]},
+
+  {id:48,city:'thailand',name:"Vertigo & Moon Bar",loc:"61st Floor, Banyan Tree Hotel, 21/100 South Sathorn Rd",
+   area:"sathorn",areaLabel:"Sathorn / Banyan Tree",cuisine:"Western / Thai (Rooftop)",
+   transit:"BTS Sala Daeng / MRT Silom",walkMin:null,driveMin:18,
+   priceRange:"฿1,200–2,500",priceNum:1800,googleRating:4.3,reviews:"7,000+",
+   vibe:"moderate",capacity:"large",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Bangkok's most iconic open-air rooftop — 61 floors up with 360° panoramic city views. Vertigo restaurant for dining, Moon Bar for sunset cocktails. Smart-casual required. An unmissable experience for overseas guests.",
+   pt:"Arrive before sunset for best views. Dress code enforced.",deal:"Smart casual required",
+   trending:["wongnai","bkmagazine","lemon8","google"]},
+
+  {id:49,city:'thailand',name:"Peppina",loc:"Sukhumvit Soi 33 / also Thonglor",
+   area:"thonglor",areaLabel:"Thonglor / Phrom Phong",cuisine:"Neapolitan Pizza / Italian",
+   transit:"BTS Phrom Phong or BTS Thong Lo",walkMin:null,driveMin:22,
+   priceRange:"฿400–850",priceNum:580,googleRating:4.5,reviews:"3,500+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["dinner"],
+   desc:"Bangkok's undisputed best pizza — wood-fired Neapolitan, certified by Italy, consistently ranked #1 in Thailand. Universally loved, great wine list. Perfect when the team needs something familiar and reliably excellent.",
+   pt:"Book ahead — consistently full on weekends",deal:null,
+   trending:["wongnai","lemon8","bkmagazine"]},
+
+  {id:50,city:'thailand',name:"80/20",loc:"Charoen Krung Soi 26, Riverside",
+   area:"riverside",areaLabel:"Charoen Krung / Riverside",cuisine:"Modern Thai (Locally Sourced)",
+   transit:"Ferry from Saphan Taksin BTS pier",walkMin:null,driveMin:25,
+   priceRange:"฿600–1,200",priceNum:850,googleRating:4.6,reviews:"1,100+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Michelin Bib Gourmand — modern Thai using 80% locally sourced Thai ingredients. Located in the creative Charoen Krung district. Thoughtful, seasonal menu that tells the story of Thai terroir. A food lover's destination.",
+   pt:"Book ahead — popular with in-the-know diners",deal:"Michelin Bib Gourmand",
+   trending:["wongnai","bkmagazine"]},
+
+  {id:51,city:'thailand',name:"Rang Mahal",loc:"Rembrandt Hotel, Sukhumvit Soi 18",
+   area:"asoke",areaLabel:"Sukhumvit Soi 18",cuisine:"Fine Indian (Halal)",
+   transit:"BTS Asoke (10 min walk)",walkMin:null,driveMin:8,
+   priceRange:"฿500–1,000",priceNum:700,googleRating:4.4,reviews:"2,200+",
+   vibe:"chill",capacity:"medium",waitPeak:"moderate",halal:true,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Bangkok's finest Indian restaurant and best halal fine dining option. Authentic North Indian — tandoori, biryani, butter chicken, fresh naan. Rooftop setting with city views. The go-to for Muslim guests or Indian visitors.",
+   pt:"Book ahead for rooftop seating",deal:"Halal certified",trending:["wongnai","google"]},
+
+  {id:52,city:'thailand',name:"Coca Restaurant",loc:"Henri Dunant Rd / also Terminal 21, Siam",
+   area:"siam",areaLabel:"Siam",cuisine:"Thai Sukiyaki / Hot Pot",
+   transit:"BTS Siam",walkMin:null,driveMin:15,
+   priceRange:"฿300–600",priceNum:420,googleRating:4.2,reviews:"5,000+",
+   vibe:"loud",capacity:"large",waitPeak:"moderate",halal:true,veg:false,grab:false,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["dinner"],
+   desc:"Thailand's original sukiyaki — interactive Thai-style hot pot with a legendary dipping sauce. Halal certified. Great for large mixed groups who need dietary flexibility. A genuine Bangkok institution since 1957.",
+   pt:"Book for groups of 6+ — peak 7–9 PM",deal:"Halal certified",
+   trending:["wongnai","google"]},
+
+  {id:53,city:'thailand',name:"SookSiam at Icon Siam",loc:"Icon Siam, 299 Charoen Nakhon Rd",
+   area:"icon-siam",areaLabel:"Icon Siam",cuisine:"Regional Thai Food Hall",
+   transit:"Gold Line BTS or hotel ferry from Saphan Taksin",walkMin:null,driveMin:25,
+   priceRange:"฿80–350",priceNum:200,googleRating:4.5,reviews:"12,000+",
+   vibe:"moderate",capacity:"large",waitPeak:"moderate",halal:true,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"Inside Bangkok's most spectacular mall — a floating market-themed food hall celebrating all Thai regional cuisines. An experience in itself: every Thai cuisine under one breathtaking roof. Iconic for overseas guests.",
+   pt:"Weekends are busy — go weeknights for calmer experience",deal:null,
+   trending:["wongnai","lemon8","bkmagazine","google"]},
+
+  {id:54,city:'thailand',name:"Sorn",loc:"56/6 Sukhumvit Soi 26",
+   area:"phrom-phong",areaLabel:"Phrom Phong",cuisine:"Southern Thai Fine Dining",
+   transit:"BTS Phrom Phong",walkMin:null,driveMin:15,
+   priceRange:"฿3,000–5,000",priceNum:4000,googleRating:4.7,reviews:"500+",
+   vibe:"chill",capacity:"small",waitPeak:"moderate",halal:false,veg:false,grab:false,
+   bestFor:["overseas-guests"],mealTypes:["dinner"],
+   desc:"Two Michelin Stars — Bangkok's pinnacle of Southern Thai cuisine. Rare spices, ancient heritage recipes, impeccable execution. For the most important guests and the most unforgettable meals. Book 1–2 months ahead.",
+   pt:"Reservation essential — book 4–8 weeks ahead",deal:"Two Michelin Stars",
+   trending:["wongnai","bkmagazine"]},
+
+  {id:55,city:'thailand',name:"Smokin' Pug",loc:"Thonglor Soi 10, Sukhumvit 55",
+   area:"thonglor",areaLabel:"Thonglor",cuisine:"American BBQ",
+   transit:"BTS Thong Lo",walkMin:null,driveMin:22,
+   priceRange:"฿400–900",priceNum:600,googleRating:4.3,reviews:"800+",
+   vibe:"loud",capacity:"medium",waitPeak:"moderate",halal:false,veg:false,grab:true,
+   bestFor:["team-outing","overseas-guests"],mealTypes:["dinner"],
+   desc:"Bangkok's favourite American BBQ — slow-smoked brisket, pulled pork, ribs with craft beer. Loud, fun, communal. Perfect for team dinners where you want to relax, eat with your hands, and forget about work.",
+   pt:"Walk-in friendly — usually no need to book on weeknights",deal:null,
+   trending:["wongnai","lemon8"]},
+
+  {id:56,city:'thailand',name:"Eathai",loc:"Central Embassy, 1031 Ploenchit Rd",
+   area:"ploenchit",areaLabel:"Central Embassy / Ploenchit",cuisine:"Premium Thai Food Hall",
+   transit:"BTS Ploen Chit",walkMin:null,driveMin:20,
+   priceRange:"฿150–450",priceNum:280,googleRating:4.4,reviews:"4,000+",
+   vibe:"moderate",capacity:"large",waitPeak:"moderate",halal:true,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing","daily-lunch"],mealTypes:["lunch","dinner"],
+   desc:"Bangkok's most curated food hall — premium stalls from top Thai chefs and cult regional classics. Tom yum, khao kha moo, mango sticky rice — all from the best sources. Beautiful space, BTS direct access.",
+   pt:"BTS-accessible — easy from anywhere on the network",deal:null,
+   trending:["wongnai","bkmagazine","lemon8"]},
+
+  {id:57,city:'thailand',name:"Blue Elephant Bangkok",loc:"233 South Sathorn Rd, Sathorn",
+   area:"sathorn",areaLabel:"Sathorn",cuisine:"Royal Thai Cuisine",
+   transit:"BTS Surasak (10 min cab)",walkMin:null,driveMin:20,
+   priceRange:"฿700–1,400",priceNum:1000,googleRating:4.4,reviews:"2,800+",
+   vibe:"chill",capacity:"large",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["overseas-guests","team-outing"],mealTypes:["dinner"],
+   desc:"A Bangkok institution housed in a stunning 1920s blue mansion. Award-winning Royal Thai cuisine — refined curries, aromatic stir-fries, elegant presentation. World-renowned, internationally recognised — great for senior international guests.",
+   pt:"Book ahead for dinner — very popular with international guests",deal:null,
+   trending:["wongnai","bkmagazine","google"]},
+
+  {id:58,city:'thailand',name:"MK Restaurant",loc:"Terminal 21 Asoke / Multiple locations",
+   area:"asoke",areaLabel:"Asoke / Terminal 21",cuisine:"Thai Sukiyaki / Hot Pot",
+   transit:"BTS Asoke",walkMin:15,driveMin:null,
+   priceRange:"฿200–450",priceNum:300,googleRating:4.2,reviews:"9,000+",
+   vibe:"loud",capacity:"large",waitPeak:"moderate",halal:false,veg:true,grab:false,
+   bestFor:["team-outing","daily-lunch"],mealTypes:["lunch","dinner"],
+   desc:"Thailand's most popular sukiyaki chain — interactive hotpot that everyone can customise. Consistent, group-friendly, affordable. Great for mixed teams with varying tastes. The MK dipping sauce has a cult following.",
+   pt:"Queue at lunch peak — turns over quickly",deal:"Weekday lunch sets available",
+   trending:["wongnai","google"]},
+];
+
+// Merge Thailand DB into main DB
+DB.push(...DB_TH);
+
 // ─── Extended dietary & health properties ─────────────────────────────────────
 // vegan: has real vegan options (no meat/dairy/eggs)
 // noBeef: can accommodate no-beef requests (false only for all-beef concepts)
@@ -531,6 +786,30 @@ const DIET_EXTRA = {
  33: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Restaurant Shu KL (Michelin)
  34: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Langkasuka (grill-heavy)
  35: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Bistro Kia Peng (modern MY)
+  // ── Thailand ──
+ 36: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Pier 21 (varied stalls, some vegan)
+ 37: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Nara Thai (fish sauce base)
+ 38: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:false}, // Greyhound Café (fusion café)
+ 39: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // S&P Restaurant
+ 40: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Somtum Der (veg papaya salad)
+ 41: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Bonchon (wheat coating)
+ 42: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:false}, // One Bangkok Food Atrium (mixed)
+ 43: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Lumpini Park Hawker
+ 44: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Suda Thai
+ 45: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Supanniga Eating Room
+ 46: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // Paste Bangkok (has veg menu)
+ 47: {vegan:false, noBeef:true,  healthy:true,  gfFriendly:true},  // Le Du (seasonal, can accommodate)
+ 48: {vegan:false, noBeef:true,  healthy:false, gfFriendly:true},  // Vertigo (Western fine dining)
+ 49: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Peppina (veg pizza, no-cheese possible)
+ 50: {vegan:true,  noBeef:true,  healthy:true,  gfFriendly:true},  // 80/20 (locally sourced, seasonal)
+ 51: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Rang Mahal (many Indian veg dishes)
+ 52: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Coca Restaurant (hotpot)
+ 53: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // SookSiam (regional food hall)
+ 54: {vegan:false, noBeef:true,  healthy:false, gfFriendly:true},  // Sorn (rice-based Southern Thai)
+ 55: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // Smokin' Pug (BBQ)
+ 56: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Eathai (curated Thai stalls)
+ 57: {vegan:true,  noBeef:true,  healthy:false, gfFriendly:false}, // Blue Elephant (veg Royal Thai menu)
+ 58: {vegan:false, noBeef:true,  healthy:false, gfFriendly:false}, // MK Restaurant (hotpot)
 };
 DB.forEach(r => {
   const ex = DIET_EXTRA[r.id] || {};
@@ -542,7 +821,7 @@ DB.forEach(r => {
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let S = {
-  step:'occasion',occasion:null,mealType:null,planningAhead:null,areaFilter:null,
+  step:'country',country:null,occasion:null,mealType:null,planningAhead:null,areaFilter:null,
   groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,
   last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]
 };
@@ -557,6 +836,124 @@ const DINNER_AREA_SETS = {
   'pj-nearby': new Set(['one-utama','damansara-uptown','mutiara-damansara','bandar-utama','ttdi','damansara-kim']),
   'mid-kl': new Set(['bangsar','mont-kiara','damansara-kim','ttdi']),
   'anywhere': new Set(['one-utama','damansara-uptown','mutiara-damansara','bandar-utama','ttdi','damansara-kim','bangsar','mont-kiara','klcc']),
+};
+
+// ─── Thailand area sets ───────────────────────────────────────────────────────
+const LUNCH_AREA_SETS_TH = {
+  'terminal21-onebkk': new Set(['asoke','one-bangkok']),
+  'lumpini-silom':     new Set(['lumpini','silom','sathorn','siam']),
+  'any-nearby-th':     new Set(['asoke','one-bangkok','lumpini','silom','sathorn','siam','ploenchit']),
+};
+const DINNER_AREA_SETS_TH = {
+  'th-nearby':   new Set(['asoke','siam','ploenchit','silom','sathorn','phrom-phong']),
+  'th-midrange': new Set(['asoke','siam','ploenchit','silom','sathorn','thonglor','ekamai','nana','phrom-phong','riverside']),
+  'th-anywhere': new Set(['asoke','one-bangkok','lumpini','silom','sathorn','ploenchit','thonglor','ekamai','siam','nana','riverside','icon-siam','asiatique','phrom-phong']),
+};
+
+// ─── Country config ───────────────────────────────────────────────────────────
+const COUNTRY_CONFIG = {
+  my: {
+    name:'Malaysia', flag:'🇲🇾', office:'First Avenue, Petaling Jaya',
+    currency:'RM',
+    budgetCaps:       {low:25,  mid:50,  high:90},
+    dinnerBudgetCaps: {low:25,  mid:100, high:200},
+    lunchAreaSets:  LUNCH_AREA_SETS,
+    dinnerAreaSets: DINNER_AREA_SETS,
+    lunchAreaQR: [
+      {l:"🏬 One Utama / First Avenue", v:"one-utama-only"},
+      {l:"🚗 Nearby streets (avoid 1U)", v:"avoid-one-utama"},
+      {l:"🗺️ Either — show best",        v:"any-nearby"},
+    ],
+    dinnerAreaQR: [
+      {l:"🏘️ Nearby PJ / Uptown / TTDI", v:"pj-nearby"},
+      {l:"🌆 Open to Bangsar / KL",       v:"mid-kl"},
+      {l:"🌃 Anywhere in KL Valley",      v:"anywhere"},
+    ],
+    lunchAreaMsg:  "Any area preference? (You can avoid One Utama if you want something different 😄)",
+    dinnerAreaMsg: "How far are you willing to go for dinner?",
+    deliveryPlatform:'GrabFood',
+    deliveryUrl:'https://food.grab.com/my/en/',
+    deliveryOffice:'First Avenue PJ',
+    grabMsg:'Delivering to First Avenue PJ. Any dietary needs?',
+    hooks:[
+      `Stomach growling. Group chat stuck at <em>"anything la"</em>. Clock ticking. 😅<br><br>Skip the debate — tell me what's going on and I'll have a suggestion ready before the next message.`,
+      `7 people. 7 opinions. Zero decisions. Been there. 😄<br><br>Tell me what you need and I'll cut straight to the answer.`,
+      `The best spot for your situation isn't always the obvious one. Good thing I know the difference. 😏`,
+      `The food's great in this area — the trick is knowing <em>which</em> great. Let me help with that.`,
+    ],
+    cravingLunch:[
+      {l:"🇲🇾 Malaysian local",v:"malaysian"},{l:"🍜 Japanese",v:"japanese"},
+      {l:"🥩 Western / Grilled",v:"western"},{l:"🥟 Chinese / Dim Sum",v:"chinese"},
+      {l:"🌶️ Bold & flavourful",v:"bold"},{l:"🥗 Healthy / Low-cal",v:"light"},
+      {l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"},
+    ],
+    cravingDinner:[
+      {l:"🇲🇾 Malaysian / Asian",v:"malaysian"},{l:"🍣 Japanese / Omakase",v:"japanese"},
+      {l:"🥩 Western / French",v:"western"},{l:"🫕 Hotpot / BBQ",v:"bold"},
+      {l:"🌶️ Thai / Korean",v:"korean"},{l:"🥗 Healthy / Light",v:"light"},
+      {l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"},
+    ],
+    budgetLunchQR: [
+      {l:"💰 Under RM20",v:"low"},{l:"💳 RM20–50",v:"mid"},{l:"💎 RM50+",v:"high"},
+    ],
+    budgetDinnerQR: [
+      {l:"💳 RM50–100 (casual)",v:"mid"},{l:"💎 RM100–200 (premium)",v:"high"},{l:"👑 RM200+ (celebration!)",v:"splurge"},
+    ],
+    mealTypeSub: {dinner:"Wider KL Valley options", delivery:"Order to your desk"},
+  },
+  th: {
+    name:'Thailand', flag:'🇹🇭', office:'The PARQ, Bangkok',
+    currency:'฿',
+    budgetCaps:       {low:100, mid:300, high:600},
+    dinnerBudgetCaps: {low:100, mid:800, high:1500},
+    lunchAreaSets:  LUNCH_AREA_SETS_TH,
+    dinnerAreaSets: DINNER_AREA_SETS_TH,
+    lunchAreaQR: [
+      {l:"🏬 Terminal 21 / One Bangkok", v:"terminal21-onebkk"},
+      {l:"🌳 Lumpini / Silom direction", v:"lumpini-silom"},
+      {l:"🗺️ Any nearby — show best",    v:"any-nearby-th"},
+    ],
+    dinnerAreaQR: [
+      {l:"🏙️ Nearby (Asoke / Silom / Sathorn)",    v:"th-nearby"},
+      {l:"🌆 Mid (Thonglor / Riverside / Nana)",   v:"th-midrange"},
+      {l:"🌃 Anywhere in Bangkok",                  v:"th-anywhere"},
+    ],
+    lunchAreaMsg:  "Which direction do you want to head for lunch?",
+    dinnerAreaMsg: "How far are you willing to venture for dinner?",
+    deliveryPlatform:'GrabFood / LINE MAN',
+    deliveryUrl:'https://food.grab.com/th/en/',
+    deliveryOffice:'The PARQ, Bangkok',
+    grabMsg:'Delivering to The PARQ. Any dietary needs?',
+    hooks:[
+      `ไม่รู้จะกินอะไร? Bangkok has thousands of options. Let's cut through the noise. 😏`,
+      `7 people. 7 opinions. ไม่รู้จะกินอะไร (what to eat?). Been there. 😄<br><br>Tell me what you need and I'll sort it.`,
+      `Bangkok traffic, Bangkok hunger. Let's get you sorted before the queue builds up. 🚦`,
+      `The best spot for your situation isn't always the obvious one. Good thing I know Bangkok. 😏`,
+    ],
+    cravingLunch:[
+      {l:"🇹🇭 Thai",v:"thai"},{l:"🌶️ E-Sarn / Isaan",v:"esarn"},
+      {l:"🍱 Japanese",v:"japanese"},{l:"🇰🇷 Korean",v:"korean"},
+      {l:"🥩 Western / Grill",v:"western"},{l:"🥗 Healthy / Light",v:"light"},
+      {l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"},
+    ],
+    cravingDinner:[
+      {l:"🇹🇭 Thai (Traditional)",v:"thai"},{l:"👑 Thai Fine Dining",v:"thaifinedining"},
+      {l:"🌆 Rooftop / Views",v:"rooftop"},{l:"🍣 Japanese / Omakase",v:"japanese"},
+      {l:"🥩 Western / Italian",v:"western"},{l:"🫕 Hotpot / BBQ",v:"bold"},
+      {l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"},
+    ],
+    budgetLunchQR: [
+      {l:"⚡ Quick (<฿100)",v:"low"},{l:"🍽️ Proper (฿101–300)",v:"mid"},{l:"💎 Large (฿301+)",v:"high"},
+    ],
+    budgetDinnerQR: [
+      {l:"🍽️ Casual (฿301–800)",v:"mid"},{l:"💎 Premium (฿801–1,500)",v:"high"},{l:"👑 Fine dining (฿1,500+)",v:"splurge"},
+    ],
+    mealTypeSub: {dinner:"Wider Bangkok options", delivery:"Order to your desk"},
+  },
+  ph: {
+    name:'Philippines', flag:'🇵🇭', office:'BGC, Manila',
+    comingSoon: true,
+  },
 };
 
 // ─── Dish Map ─────────────────────────────────────────────────────────────────
@@ -1014,6 +1411,10 @@ window.excludeRestaurant = async function(id, name) {
 function score(r) {
   let s = 0;
 
+  // Country filter — r.city undefined means Malaysia (legacy records)
+  const rCountry = r.city === 'thailand' ? 'th' : 'my';
+  if (rCountry !== S.country) return -1;
+
   // Meal type match
   if (S.mealType === 'lunch' && !r.mealTypes.includes('lunch')) return -1;
   if (S.mealType === 'dinner' && !r.mealTypes.includes('dinner')) return -1;
@@ -1043,10 +1444,11 @@ function score(r) {
     if (res && res.bookUrl) s += 2;
   }
 
-  // Area filter
+  // Area filter — use country-specific area sets
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
   let areaSet = null;
-  if (S.mealType === 'lunch' && S.areaFilter) areaSet = LUNCH_AREA_SETS[S.areaFilter];
-  if (S.mealType === 'dinner' && S.areaFilter) areaSet = DINNER_AREA_SETS[S.areaFilter];
+  if (S.mealType === 'lunch'  && S.areaFilter) areaSet = cc.lunchAreaSets[S.areaFilter];
+  if (S.mealType === 'dinner' && S.areaFilter) areaSet = cc.dinnerAreaSets[S.areaFilter];
   if (areaSet && !areaSet.has(r.area)) return -1;
 
   // Hard dietary stops
@@ -1083,13 +1485,13 @@ function score(r) {
   if (S.time === 'normal' && r.waitPeak === 'slow') s -= 4;
   if (S.time === 'relaxed') s += 2;
 
-  // Budget
-  const budgetCaps = { low:25, mid:S.mealType==='dinner'?100:50, high:S.mealType==='dinner'?200:90, splurge:9999 };
-  if (S.budget === 'low' && r.priceNum > 25) return -1;
-  if (S.budget === 'mid' && r.priceNum > budgetCaps.mid) return -1;
-  if (S.budget === 'high' && r.priceNum > budgetCaps.high) s -= 3;
-  if (S.budget === 'splurge' && r.priceNum > 150) s += 8;
-  if (S.budget === 'low' && r.priceNum <= 15) s += 6;
+  // Budget — country-aware thresholds
+  const caps = S.mealType === 'dinner' ? cc.dinnerBudgetCaps : cc.budgetCaps;
+  if (S.budget === 'low'    && r.priceNum > caps.low)        return -1;
+  if (S.budget === 'mid'    && r.priceNum > caps.mid)        return -1;
+  if (S.budget === 'high'   && r.priceNum > caps.high)       s -= 3;
+  if (S.budget === 'splurge'&& r.priceNum > caps.high * 2)   s += 8;
+  if (S.budget === 'low'    && r.priceNum <= caps.low * 0.6) s += 6;
 
   // Occasion
   if (r.bestFor.includes(S.occasion)) s += 8;
@@ -1101,19 +1503,23 @@ function score(r) {
     else s -= 8;
   } else {
     const cMap = {
-      malaysian:['Malaysian','Kopitiam','Nyonya','Peranakan','Ipoh','Malay'],
-      japanese:['Japanese','Ramen','Mazesoba','Sushi','Omakase','Wagyu','Izakaya'],
-      western:['Western','BBQ','French','American','Spanish','Bistro','Tapas','Café'],
-      chinese:['Chinese','Taiwanese','Dim Sum','Fujian','Hotpot'],
-      korean:['Korean'],
-      latin:['Latin','Peruvian'],
-      bold:['Thai','Korean','Peri-Peri','Nashville','Wagyu','BBQ','Spicy','Hotpot'],
-      any:[],
+      malaysian:     ['Malaysian','Kopitiam','Nyonya','Peranakan','Ipoh','Malay'],
+      thai:          ['Thai','Food Court','Sukiyaki','Street Food','Royal Thai','Hawker'],
+      esarn:         ['Northeastern','E-sarn','Isaan'],
+      thaifinedining:['Modern Thai','Royal Thai','Southern Thai'],
+      rooftop:       ['Rooftop'],
+      japanese:      ['Japanese','Ramen','Mazesoba','Sushi','Omakase','Wagyu','Izakaya'],
+      western:       ['Western','BBQ','French','American','Spanish','Bistro','Tapas','Café','Italian','Neapolitan'],
+      chinese:       ['Chinese','Taiwanese','Dim Sum','Fujian','Hotpot','Sukiyaki'],
+      korean:        ['Korean'],
+      latin:         ['Latin','Peruvian'],
+      bold:          ['Thai','Korean','Peri-Peri','Nashville','Wagyu','BBQ','Hotpot'],
+      any:           [],
     };
     const keys = cMap[S.craving]||[];
     if (!keys.length) s += 2; // 'any' — no preference, small nudge
     else if (keys.some(k => r.cuisine.toLowerCase().includes(k.toLowerCase()))) s += 12;
-    else s -= 10; // Mismatch: doesn't fit the craving at all
+    else s -= 30; // Strong mismatch — craving is an explicit user choice, not a soft preference
   }
 
   // Vibe
@@ -1157,7 +1563,7 @@ function score(r) {
 function getSuggestions(grabOnly=false) {
   let pool = grabOnly ? DB.filter(r=>r.grab) : DB;
   return pool.map(r=>({r,s:score(r)})).filter(x=>x.s>0)
-    .sort((a,b)=>b.s-a.s).slice(0,3).map(x=>x.r);
+    .sort((a,b)=>b.s-a.s).slice(0,5).map(x=>x.r);
 }
 
 // ─── Grab delivery UI ─────────────────────────────────────────────────────────
@@ -1188,15 +1594,82 @@ function buildGrabPanel(restaurants) {
   return `
     <div class="grab-delivery-box">
       <h3>🛵 Grab Delivery Picks</h3>
-      <p>These spots deliver to First Avenue PJ. Search them by name in the Grab app for live ETAs and promo codes.</p>
+      <p>These spots deliver to ${(COUNTRY_CONFIG[S.country]||COUNTRY_CONFIG.my).deliveryOffice}. Search them by name in the app for live ETAs and promo codes.</p>
       <div style="margin:6px 0;display:flex;flex-wrap:wrap;gap:4px">
         <span class="promo-tag">💰 Check GrabFood promos</span>
         <span class="promo-tag">🏷️ PayLater discounts</span>
         <span class="promo-tag">🔁 Grab Unlimited free delivery</span>
       </div>
       ${items}
-      <button class="grab-open-btn" onclick="window.open('https://food.grab.com/my/en/','_blank')">Open Grab Food →</button>
+      <button class="grab-open-btn" onclick="window.open((COUNTRY_CONFIG[S.country]||COUNTRY_CONFIG.my).deliveryUrl,'_blank')">Open ${(COUNTRY_CONFIG[S.country]||COUNTRY_CONFIG.my).deliveryPlatform.split('/')[0].trim()} →</button>
     </div>`;
+}
+
+// ─── Reason builder — explains why each restaurant was picked ─────────────────
+function buildReasons(r) {
+  const tags = [];
+
+  // Craving match — name the cuisine type that matched
+  if (S.craving && S.craving !== 'any') {
+    const labels = {
+      malaysian:'🇲🇾 Malaysian cuisine',japanese:'🍱 Japanese cuisine',
+      western:'🥩 Western food',chinese:'🥟 Chinese cuisine',
+      korean:'🌶️ Korean cuisine',bold:'🔥 Bold & flavourful',light:'🥗 Healthy & light',
+    };
+    if (S.craving === 'light') {
+      if (r.healthy) tags.push(labels.light);
+    } else {
+      const cMap = {
+        malaysian:['Malaysian','Kopitiam','Nyonya','Peranakan','Ipoh','Malay'],
+        japanese:['Japanese','Ramen','Mazesoba','Sushi','Omakase','Wagyu','Izakaya'],
+        western:['Western','BBQ','French','American','Spanish','Bistro','Tapas','Café'],
+        chinese:['Chinese','Taiwanese','Dim Sum','Fujian','Hotpot'],
+        korean:['Korean'],
+        bold:['Thai','Korean','Peri-Peri','Nashville','Wagyu','BBQ','Spicy','Hotpot'],
+      };
+      const keys = cMap[S.craving] || [];
+      if (keys.some(k => r.cuisine.toLowerCase().includes(k.toLowerCase())))
+        tags.push(labels[S.craving]);
+    }
+  }
+
+  // Dietary requirements met
+  if (S.dietary.includes('halal') && r.halal) tags.push('✅ Halal certified');
+  if (S.dietary.includes('vegetarian') && r.veg) tags.push('🥦 Vegetarian options');
+  if (S.dietary.includes('vegan') && r.vegan) tags.push('🌱 Vegan friendly');
+  if (S.dietary.includes('no-beef') && r.noBeef) tags.push('🥩 No beef accommodated');
+  if (S.dietary.includes('gluten-free') && r.gfFriendly) tags.push('🌾 Lower gluten risk');
+  if (S.dietary.includes('kosher') && (r.veg || r.vegan)) tags.push('🥦 Best kosher-proxy option');
+
+  // Very close to office
+  if (r.walkMin && r.walkMin <= 5) tags.push(`🚶 ${r.walkMin} min from your desk`);
+
+  // Occasion fit
+  if (S.occasion === 'overseas-guests' && r.bestFor.includes('overseas-guests'))
+    tags.push('🌍 Guest-worthy experience');
+  if (S.occasion === 'team-outing' && r.bestFor.includes('team-outing'))
+    tags.push('👥 Great for team outings');
+
+  // Vibe match
+  if (S.vibe === 'chill' && r.vibe === 'chill') tags.push('🔇 Quiet — easy to talk');
+  if (S.vibe === 'moderate' && r.vibe === 'moderate') tags.push('🎵 Good energy');
+
+  // Group size
+  if (S.groupSize >= 6 && r.capacity === 'large') tags.push('👥 Handles large groups');
+
+  // Budget fit
+  if (S.budget === 'low' && r.priceNum <= 15) tags.push('💰 Very affordable');
+  if (S.budget === 'splurge' && r.priceNum >= 150) tags.push('👑 Premium experience');
+
+  // Rating confidence (only fill if not already rich with reasons)
+  if (r.googleRating >= 4.5 && tags.length < 2)
+    tags.push(`⭐ ${r.googleRating} on Google (${r.reviews} reviews)`);
+
+  // Trending (only if strong signal)
+  if (r.trending.length >= 3 && tags.length < 3)
+    tags.push('🔥 Trending across platforms');
+
+  return tags.slice(0, 4);
 }
 
 // ─── Card builder ─────────────────────────────────────────────────────────────
@@ -1204,6 +1677,9 @@ function buildCard(r, isDinner=false) {
   const dist = r.walkMin
     ? `<span class="pl walk">🚶 ${r.walkMin} min walk</span>`
     : `<span class="pl drive">🚗 ~${r.driveMin} min drive</span>`;
+  const transitPill = r.transit
+    ? `<span class="pl bts">🚇 ${r.transit}</span>`
+    : '';
   const wt = {fast:'⚡ Fast',moderate:'⏱ ~15 min',slow:'🕐 Allow time'};
   const vb = {chill:'🔇 Chill',moderate:'🎵 Moderate',loud:'🔊 Lively'};
 
@@ -1239,6 +1715,11 @@ function buildCard(r, isDinner=false) {
     </div>`;
   }
 
+  const reasons = buildReasons(r);
+  const whyHtml = reasons.length
+    ? `<div class="why-picks"><div class="why-label">Why this pick</div><div>${reasons.map(t=>`<span class="why-tag">${t}</span>`).join('')}</div></div>`
+    : '';
+
   const menuMeta = getMenuLink(r.id);
   const menuBtn = menuMeta
     ? `<a href="${menuMeta.url}" target="_blank" title="${menuMeta.title}" style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;color:var(--g);text-decoration:none;padding:4px 10px;border:1.5px solid var(--g);border-radius:20px;transition:all .15s" onmouseover="this.style.background='#e6f7ee'" onmouseout="this.style.background='transparent'">${menuMeta.label}</a>`
@@ -1262,14 +1743,16 @@ function buildCard(r, isDinner=false) {
       <div class="rc-body">
         <div class="rc-meta">${r.cuisine} · <span class="pl ar" style="display:inline;padding:1px 6px">${r.areaLabel}</span></div>
         <div class="rc-desc">${r.desc}</div>
+        ${whyHtml}
         ${r.deal ? `<div class="rc-deal">🏷️ ${r.deal}</div>` : ''}
         ${r.pt ? `<div class="${ptClass}">${ptText}</div>` : ''}
         <div class="pills">
           ${dist}
+          ${transitPill}
           <span class="pl t">${wt[r.waitPeak]}</span>
           <span class="pl vb">${vb[r.vibe]}</span>
           ${r.halal?'<span class="pl h">✅ Halal</span>':''}
-          ${r.grab?'<span class="pl gr">🟢 On Grab</span>':''}
+          ${r.grab?`<span class="pl gr">🟢 On ${(COUNTRY_CONFIG[S.country]||COUNTRY_CONFIG.my).deliveryPlatform.split('/')[0].trim()}</span>`:''}
           ${r.capacity==='large'?'<span class="pl gp">👥 Group-friendly</span>':''}
         </div>
         ${resBanner}
@@ -1404,6 +1887,7 @@ async function onQR(label,value) {
 async function advance() {
   const cur = S.step;
 
+  if (cur==='country')  { S.step='occasion'; await askOccasion(); return; }
   if (cur==='occasion') { S.step='mealType'; await askMealType(); return; }
   if (cur==='mealType') {
     if (S.mealType==='grab-delivery') { S.step='grab-dietary'; await askGrabFlow(); return; }
@@ -1440,15 +1924,26 @@ const STEP_MSGS = {
 };
 
 async function askStep(step) {
-  let cfg = STEP_MSGS[step];
-  if (step==='craving') cfg = S.mealType==='dinner' ? cfg.dinner : cfg.lunch;
-  if (step==='budget') cfg = S.mealType==='dinner' ? cfg.dinner : cfg.lunch;
-  await botSay(cfg.msg,650);
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  if (step === 'craving') {
+    const qr  = S.mealType === 'dinner' ? cc.cravingDinner : cc.cravingLunch;
+    const msg = S.mealType === 'dinner' ? "What kind of dinner are you after?" : "What are you craving?";
+    await botSay(msg, 650); setQR(qr); return;
+  }
+  if (step === 'budget') {
+    const qr  = S.mealType === 'dinner' ? cc.budgetDinnerQR : cc.budgetLunchQR;
+    const msg = S.mealType === 'dinner' ? "Budget per person for dinner?" : "Budget per person?";
+    await botSay(msg, 650); setQR(qr); return;
+  }
+  const cfg = STEP_MSGS[step];
+  await botSay(cfg.msg, 650);
   setQR(cfg.qr);
 }
 
 async function askMealType() {
-  await botSay("Is this for lunch, dinner, or do you want to order delivery via Grab?", 650);
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  const dinnerSub = cc.mealTypeSub?.dinner || 'Wider city options';
+  await botSay("Is this for lunch, dinner, or do you want to order delivery?", 650);
   const mealTabsEl = document.createElement('div');
   mealTabsEl.className='meal-tabs';
   mealTabsEl.innerHTML=`
@@ -1460,12 +1955,12 @@ async function askMealType() {
     <button class="mt-btn" onclick="pickMeal('dinner')">
       <span class="mt-icon">🌙</span>
       <span class="mt-label">Dinner</span>
-      <span class="mt-sub">Wider KL Valley options</span>
+      <span class="mt-sub">${dinnerSub}</span>
     </button>
     <button class="mt-btn grab" onclick="pickMeal('grab-delivery')">
       <span class="mt-icon">🛵</span>
-      <span class="mt-label">Grab Delivery</span>
-      <span class="mt-sub">Order to your desk</span>
+      <span class="mt-label">Delivery</span>
+      <span class="mt-sub">${cc.deliveryPlatform}</span>
     </button>`;
   qrEl.appendChild(mealTabsEl);
 }
@@ -1479,6 +1974,7 @@ window.pickMeal = async function(val) {
 
 async function askWalkIn() {
   const nowOpen = DB.filter(r => {
+    if ((r.city === 'thailand' ? 'th' : 'my') !== S.country) return false;
     const s = getOpenStatus(r.id);
     return s.status === 'closed' || s.status === 'not-yet';
   }).length;
@@ -1497,40 +1993,41 @@ async function askWalkIn() {
 }
 
 async function askAreaPref() {
-  if (S.mealType==='lunch') {
-    await botSay("Any area preference? (You can avoid One Utama if you want something different 😄)", 650);
-    setQR([
-      {l:"🏬 One Utama / First Avenue",v:"one-utama-only",fn:pickArea},
-      {l:"🚗 Nearby streets (avoid 1U)",v:"avoid-one-utama",fn:pickArea},
-      {l:"🗺️ Either — show me the best",v:"any-nearby",fn:pickArea},
-    ]);
-  } else {
-    await botSay("How far are you willing to go for dinner?", 650);
-    setQR([
-      {l:"🏘️ Stay nearby PJ / Uptown / TTDI",v:"pj-nearby",fn:pickArea},
-      {l:"🌆 Open to Bangsar / KL",v:"mid-kl",fn:pickArea},
-      {l:"🌃 Anywhere in KL Valley",v:"anywhere",fn:pickArea},
-    ]);
-  }
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  const isLunch = S.mealType === 'lunch';
+  const msg = isLunch ? cc.lunchAreaMsg : cc.dinnerAreaMsg;
+  const qrItems = (isLunch ? cc.lunchAreaQR : cc.dinnerAreaQR)
+    .map(item => ({...item, fn: pickArea}));
+  await botSay(msg, 650);
+  setQR(qrItems);
 }
 
 window.pickArea = async function(val) {
-  const labels = {
+  const allLabels = {
+    // Malaysia
     'one-utama-only':'🏬 One Utama / First Avenue',
     'avoid-one-utama':'🚗 Nearby streets (no 1U)',
     'any-nearby':'🗺️ Any nearby area',
     'pj-nearby':'🏘️ Staying nearby PJ',
     'mid-kl':'🌆 Bangsar / KL area',
     'anywhere':'🌃 Anywhere in KL Valley',
+    // Thailand
+    'terminal21-onebkk':'🏬 Terminal 21 / One Bangkok',
+    'lumpini-silom':'🌳 Lumpini / Silom direction',
+    'any-nearby-th':'🗺️ Any nearby area',
+    'th-nearby':'🏙️ Nearby (Asoke / Silom / Sathorn)',
+    'th-midrange':'🌆 Mid (Thonglor / Riverside / Nana)',
+    'th-anywhere':'🌃 Anywhere in Bangkok',
   };
-  addMsg(labels[val]||val,'user'); qrEl.innerHTML='';
+  addMsg(allLabels[val]||val, 'user'); qrEl.innerHTML='';
   S.areaFilter = val; S.step = 'areaPreference';
   await advance();
 };
 
 // ─── Grab sub-flow ────────────────────────────────────────────────────────────
 async function askGrabFlow() {
-  await botSay("Delivering to First Avenue PJ. Any dietary needs?", 650);
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  await botSay(cc.grabMsg, 650);
   setQR([
     {l:"✅ Halal only",v:"halal",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
     {l:"🌱 Vegan",v:"vegan",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
@@ -1592,8 +2089,10 @@ async function showResults() {
     await showFeedback(); return;
   }
 
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
   const occLabel = {'overseas-guests':'for your guests','team-outing':'for the team','daily-lunch':'for you today'}[S.occasion]||'';
-  await botSay(`Here are my top picks ${occLabel} — all <strong>⭐ 4.0+ rated on Google</strong> ${isDinner?'🌙':'☀️'}`, 700);
+  const ratingNote = S.country === 'th' ? 'Google & Wongnai' : 'Google';
+  await botSay(`Here are my top picks ${occLabel} — all <strong>⭐ 4.0+ rated on ${ratingNote}</strong> ${isDinner?'🌙':'☀️'}`, 700);
 
   if (PEAK.level !== 'green') {
     await botSay(`<strong>${PEAK.label}</strong> — ${PEAK.note}`, 450);
@@ -1683,24 +2182,61 @@ inpEl.addEventListener('keydown',e=>{ if(e.key==='Enter') handleSend(); });
 
 // ─── Reset & init ─────────────────────────────────────────────────────────────
 function resetChat() {
-  S={step:'occasion',occasion:null,mealType:null,planningAhead:null,areaFilter:null,groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]};
+  S={step:'country',country:null,occasion:null,mealType:null,planningAhead:null,areaFilter:null,groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]};
   chatEl.innerHTML=''; qrEl.innerHTML=''; startChat();
 }
 
 async function startChat() {
-  const hooks = [
-    `Stomach growling. Group chat stuck at <em>"anything la"</em>. Clock ticking. 😅<br><br>Skip the debate — tell me what's going on and I'll have a suggestion ready before the next message.`,
-    `7 people. 7 opinions. Zero decisions. Been there. 😄<br><br>Tell me what you need and I'll cut straight to the answer.`,
-    `The best spot for your situation isn't always the obvious one. Good thing I know the difference. 😏`,
-    `The food's great in this area — the trick is knowing <em>which</em> great. Let me help with that.`,
-  ];
-  const hook = hooks[new Date().getDay() % hooks.length];
+  await botSay(`Hey! 👋 I know the best spots near every Grab office.<br><br>Which office are you at?`, 700);
+  S.step = 'country';
+  const tabsEl = document.createElement('div');
+  tabsEl.className = 'city-tabs';
+  tabsEl.innerHTML = `
+    <button class="city-btn" onclick="pickCountry('my')">
+      <span class="city-flag">🇲🇾</span>
+      <div class="city-info">
+        <span class="city-name">Malaysia</span>
+        <span class="city-sub">First Avenue, Petaling Jaya</span>
+      </div>
+    </button>
+    <button class="city-btn" onclick="pickCountry('th')">
+      <span class="city-flag">🇹🇭</span>
+      <div class="city-info">
+        <span class="city-name">Thailand</span>
+        <span class="city-sub">The PARQ, Bangkok</span>
+      </div>
+    </button>
+    <button class="city-btn coming-soon">
+      <span class="city-flag">🇵🇭</span>
+      <div class="city-info">
+        <span class="city-name">Philippines &nbsp;<span style="font-size:10px;background:#eee;color:#888;padding:1px 7px;border-radius:10px;font-weight:600">Coming soon</span></span>
+        <span class="city-sub">BGC, Manila</span>
+      </div>
+    </button>`;
+  qrEl.appendChild(tabsEl);
+}
+
+window.pickCountry = async function(code) {
+  const cc = COUNTRY_CONFIG[code];
+  if (!cc || cc.comingSoon) return;
+  const label = `${cc.flag} ${cc.name} — ${cc.office}`;
+  addMsg(label, 'user'); qrEl.innerHTML = '';
+  S.country = code; S.step = 'country';
+  // Update header subtitle dynamically
+  const subEl = document.querySelector('.hdr-info p');
+  if (subEl) subEl.textContent = `${cc.flag} ${cc.name} · ${cc.office}`;
+  await advance();
+};
+
+async function askOccasion() {
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  const hook = cc.hooks[new Date().getDay() % cc.hooks.length];
   await botSay(`${hook}<br><br>${PEAK.level!=='green'?`<span style="font-weight:600">${PEAK.label}</span> — ${PEAK.note}<br><br>`:''}What's the occasion today?`, 700);
-  S.step='occasion';
+  S.step = 'occasion';
   setQR([
-    {l:"🌍 Hosting overseas guests",v:"overseas-guests"},
-    {l:"👥 Team lunch / outing",v:"team-outing"},
-    {l:"🍜 Personal lunch / dinner",v:"daily-lunch"},
+    {l:"🌍 Hosting overseas guests", v:"overseas-guests"},
+    {l:"👥 Team lunch / outing",      v:"team-outing"},
+    {l:"🍜 Personal lunch / dinner",  v:"daily-lunch"},
   ]);
 }
 
