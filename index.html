@@ -161,8 +161,11 @@
       <p>First Avenue · One Utama · KL Valley</p>
     </div>
     <div class="hdr-r">
-      <div class="hbadge">🇲🇾 Grab HQ</div>
-      <div class="hpeak" id="peakBadge"></div>
+      <div class="hbadge" id="hdrBadge">🇲🇾 Grab HQ</div>
+      <div style="display:flex;gap:5px;align-items:center">
+        <div class="hpeak" id="peakBadge"></div>
+        <button id="langToggle" onclick="toggleLang()" style="display:none;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.35);font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;cursor:pointer;letter-spacing:.3px;white-space:nowrap">🌐 ภาษาไทย</button>
+      </div>
     </div>
   </div>
   <div class="chat" id="chat"></div>
@@ -821,7 +824,7 @@ DB.forEach(r => {
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let S = {
-  step:'country',country:null,occasion:null,mealType:null,planningAhead:null,areaFilter:null,
+  step:'country',country:null,lang:'en',occasion:null,mealType:null,planningAhead:null,areaFilter:null,
   groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,
   last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]
 };
@@ -930,11 +933,36 @@ const COUNTRY_CONFIG = {
       `Bangkok traffic, Bangkok hunger. Let's get you sorted before the queue builds up. 🚦`,
       `The best spot for your situation isn't always the obvious one. Good thing I know Bangkok. 😏`,
     ],
+    hooksTH:[
+      `กินอะไรดี? กรุงเทพมีตัวเลือกหลายพันร้าน มาหาร้านที่ใช่สำหรับคุณกัน 😏`,
+      `7 คน 7 ความคิด ไม่รู้จะกินอะไร 😄<br><br>บอกมาเลย เดี๋ยวจัดการให้`,
+      `รถติด ท้องหิว มาจัดการเรื่องกินก่อนคิวยาวขึ้น 🚦`,
+      `ร้านที่ดีที่สุดไม่ใช่ร้านที่ดังที่สุดเสมอไป โชคดีที่ฉันรู้จักกรุงเทพดี 😏`,
+    ],
+    lunchAreaMsgTH: "อยากไปทิศไหนสำหรับมื้อกลางวัน?",
+    dinnerAreaMsgTH: "ยินดีเดินทางไกลแค่ไหนสำหรับมื้อเย็น?",
+    grabMsgTH: "ส่งมาที่ The PARQ นะ มีข้อจำกัดด้านอาหารไหม?",
+    lunchAreaQRTH: [
+      {l:"🏬 Terminal 21 / One Bangkok",   v:"terminal21-onebkk"},
+      {l:"🌳 ทิศลุมพินี / สีลม",            v:"lumpini-silom"},
+      {l:"🗺️ บริเวณใกล้เคียง — แสดงดีที่สุด", v:"any-nearby-th"},
+    ],
+    dinnerAreaQRTH: [
+      {l:"🏙️ ใกล้ (อโศก / สีลม / สาทร)",            v:"th-nearby"},
+      {l:"🌆 กลาง (ทองหล่อ / ริเวอร์ไซด์ / นานา)", v:"th-midrange"},
+      {l:"🌃 ทั่วกรุงเทพ",                              v:"th-anywhere"},
+    ],
     cravingLunch:[
       {l:"🇹🇭 Thai",v:"thai"},{l:"🌶️ E-Sarn / Isaan",v:"esarn"},
       {l:"🍱 Japanese",v:"japanese"},{l:"🇰🇷 Korean",v:"korean"},
       {l:"🥩 Western / Grill",v:"western"},{l:"🥗 Healthy / Light",v:"light"},
       {l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"},
+    ],
+    cravingLunchTH:[
+      {l:"🇹🇭 อาหารไทย",v:"thai"},{l:"🌶️ อาหารอีสาน",v:"esarn"},
+      {l:"🍱 อาหารญี่ปุ่น",v:"japanese"},{l:"🇰🇷 อาหารเกาหลี",v:"korean"},
+      {l:"🥩 ตะวันตก / ย่างเนื้อ",v:"western"},{l:"🥗 เพื่อสุขภาพ / เบาๆ",v:"light"},
+      {l:"✨ เซอร์ไพรส์ฉันเลย",v:"any"},{l:"🔍 มีเมนูที่ต้องการ…",v:"dish-search"},
     ],
     cravingDinner:[
       {l:"🇹🇭 Thai (Traditional)",v:"thai"},{l:"👑 Thai Fine Dining",v:"thaifinedining"},
@@ -942,19 +970,79 @@ const COUNTRY_CONFIG = {
       {l:"🥩 Western / Italian",v:"western"},{l:"🫕 Hotpot / BBQ",v:"bold"},
       {l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"},
     ],
+    cravingDinnerTH:[
+      {l:"🇹🇭 อาหารไทย (แบบดั้งเดิม)",v:"thai"},{l:"👑 ไฟน์ไดนิ่งไทย",v:"thaifinedining"},
+      {l:"🌆 บนดาดฟ้า / วิวสวย",v:"rooftop"},{l:"🍣 ญี่ปุ่น / โอมากาเสะ",v:"japanese"},
+      {l:"🥩 ตะวันตก / อิตาเลียน",v:"western"},{l:"🫕 หม้อไฟ / ปิ้งย่าง",v:"bold"},
+      {l:"✨ เซอร์ไพรส์ฉันเลย",v:"any"},{l:"🔍 มีเมนูที่ต้องการ…",v:"dish-search"},
+    ],
     budgetLunchQR: [
       {l:"⚡ Quick (<฿100)",v:"low"},{l:"🍽️ Proper (฿101–300)",v:"mid"},{l:"💎 Large (฿301+)",v:"high"},
+    ],
+    budgetLunchQRTH: [
+      {l:"⚡ เร็วๆ (<฿100)",v:"low"},{l:"🍽️ อิ่มๆ (฿101–300)",v:"mid"},{l:"💎 จัดหนัก (฿301+)",v:"high"},
     ],
     budgetDinnerQR: [
       {l:"🍽️ Casual (฿301–800)",v:"mid"},{l:"💎 Premium (฿801–1,500)",v:"high"},{l:"👑 Fine dining (฿1,500+)",v:"splurge"},
     ],
+    budgetDinnerQRTH: [
+      {l:"🍽️ ทั่วไป (฿301–800)",v:"mid"},{l:"💎 พรีเมียม (฿801–1,500)",v:"high"},{l:"👑 ไฟน์ไดนิ่ง (฿1,500+)",v:"splurge"},
+    ],
     mealTypeSub: {dinner:"Wider Bangkok options", delivery:"Order to your desk"},
+    mealTypeSubTH: {dinner:"ร้านอาหารทั่วกรุงเทพ", delivery:"สั่งถึงโต๊ะ"},
   },
   ph: {
     name:'Philippines', flag:'🇵🇭', office:'BGC, Manila',
     comingSoon: true,
   },
 };
+
+// ─── Language helpers ─────────────────────────────────────────────────────────
+// t(en, th) — returns Thai string when S.lang==='th', otherwise English
+function t(en, th) {
+  return (S && S.lang === 'th' && th !== undefined) ? th : en;
+}
+
+function updateLangToggle() {
+  const btn = document.getElementById('langToggle');
+  const badge = document.getElementById('hdrBadge');
+  if (!btn) return;
+  if (S.country === 'th') {
+    btn.style.display = '';
+    if (S.lang === 'th') {
+      btn.textContent = '🌐 EN';
+      btn.title = 'Switch to English';
+    } else {
+      btn.textContent = '🌐 ภาษาไทย';
+      btn.title = 'เปลี่ยนเป็นภาษาไทย';
+    }
+  } else {
+    btn.style.display = 'none';
+  }
+  if (badge && S.country) {
+    const cc = COUNTRY_CONFIG[S.country];
+    if (cc) badge.textContent = `${cc.flag} Grab ${S.country === 'my' ? 'HQ' : cc.name}`;
+  }
+}
+
+async function toggleLang() {
+  S.lang = S.lang === 'th' ? 'en' : 'th';
+  resetChat();
+}
+
+async function askLanguage() {
+  await botSay('How would you like to chat?<br><span style="font-size:12px;color:#9aa">ต้องการใช้ภาษาอะไร?</span>', 600);
+  setQR([
+    {l:'🇬🇧 English', v:'en', fn: async () => {
+      addMsg('🇬🇧 English', 'user'); qrEl.innerHTML = '';
+      S.lang = 'en'; updateLangToggle(); await advance();
+    }},
+    {l:'🇹🇭 ภาษาไทย', v:'th', fn: async () => {
+      addMsg('🇹🇭 ภาษาไทย', 'user'); qrEl.innerHTML = '';
+      S.lang = 'th'; updateLangToggle(); await advance();
+    }},
+  ]);
+}
 
 // ─── Dish Map ─────────────────────────────────────────────────────────────────
 // Each entry maps keyword aliases → restaurant IDs with a specialty note
@@ -1352,16 +1440,16 @@ function getOpenStatus(id) {
 window.moreLikeThis = async function(id) {
   const r = DB.find(x => x.id === id); if (!r) return;
   const safeName = r.name.replace(/'/g,"\\'");
-  addMsg(`🔁 More like ${r.name}`, 'user'); qrEl.innerHTML='';
+  addMsg(t(`🔁 More like ${r.name}`,`🔁 แบบเดียวกับ ${r.name}`), 'user'); qrEl.innerHTML='';
 
   const subs = getCuisineSubOptions(r);
   if (subs.length === 1) {
-    await botSay(`Finding more <strong>${subs[0].l}</strong> options for you…`, 550);
+    await botSay(t(`Finding more <strong>${subs[0].l}</strong> options for you…`,`กำลังหา <strong>${subs[0].l}</strong> ให้…`), 550);
     await runDishSearch(subs[0].v);
     return;
   }
 
-  await botSay(`What specifically about <strong>${r.name}</strong> caught your eye?`, 600);
+  await botSay(t(`What specifically about <strong>${r.name}</strong> caught your eye?`,`ชอบอะไรใน <strong>${r.name}</strong> เป็นพิเศษ?`), 600);
   setQR(subs.map(opt => ({
     l: opt.l, v: opt.v,
     fn: async (v) => {
@@ -1386,7 +1474,7 @@ window.excludeRestaurant = async function(id, name) {
     setTimeout(() => card.remove(), 280);
   }
 
-  await botSay(`<strong>${name}</strong> removed — finding a replacement with the same criteria… 🔄`, 550);
+  await botSay(t(`<strong>${name}</strong> removed — finding a replacement with the same criteria… 🔄`,`นำ <strong>${name}</strong> ออกแล้ว — กำลังหาตัวเลือกใหม่ที่เงื่อนไขเดิม… 🔄`), 550);
 
   // Always find a fresh replacement using the exact same session framework
   const fresh = getSuggestions().slice(0, 1);
@@ -1401,9 +1489,9 @@ window.excludeRestaurant = async function(id, name) {
     await new Promise(ok => setTimeout(ok, 350));
     const isDinner = S.mealType === 'dinner';
     addCard(buildCard(fresh[0], isDinner));
-    await botSay("New pick added above 👆 — same filters, different spot.", 500);
+    await botSay(t("New pick added above 👆 — same filters, different spot.","เพิ่มตัวเลือกใหม่ด้านบนแล้ว 👆 — เงื่อนไขเดิม ร้านใหม่"), 500);
   } else {
-    await botSay("No more matches left with your current filters. Try broadening your area or budget, or tap <strong>Start over</strong> for a fresh search.", 600);
+    await botSay(t("No more matches left with your current filters. Try broadening your area or budget, or tap <strong>Start over</strong> for a fresh search.","ไม่มีร้านที่ตรงกับเงื่อนไขของคุณแล้ว ลองขยายพื้นที่หรืองบประมาณ หรือกด <strong>เริ่มใหม่</strong>"), 600);
   }
 };
 
@@ -1591,10 +1679,11 @@ function buildGrabPanel(restaurants) {
       </div>
     </div>`).join('');
 
+  const deliveryOffice = (COUNTRY_CONFIG[S.country]||COUNTRY_CONFIG.my).deliveryOffice;
   return `
     <div class="grab-delivery-box">
-      <h3>🛵 Grab Delivery Picks</h3>
-      <p>These spots deliver to ${(COUNTRY_CONFIG[S.country]||COUNTRY_CONFIG.my).deliveryOffice}. Search them by name in the app for live ETAs and promo codes.</p>
+      <h3>${t('🛵 Grab Delivery Picks','🛵 แนะนำสำหรับเดลิเวอรี่')}</h3>
+      <p>${t(`These spots deliver to ${deliveryOffice}. Search them by name in the app for live ETAs and promo codes.`,`ร้านเหล่านี้ส่งมาที่ ${deliveryOffice} ค้นหาชื่อร้านในแอปเพื่อดูเวลาและโปรโมชั่น`)}</p>
       <div style="margin:6px 0;display:flex;flex-wrap:wrap;gap:4px">
         <span class="promo-tag">💰 Check GrabFood promos</span>
         <span class="promo-tag">🏷️ PayLater discounts</span>
@@ -1611,11 +1700,21 @@ function buildReasons(r) {
 
   // Craving match — name the cuisine type that matched
   if (S.craving && S.craving !== 'any') {
-    const labels = {
+    const labelsEN = {
       malaysian:'🇲🇾 Malaysian cuisine',japanese:'🍱 Japanese cuisine',
       western:'🥩 Western food',chinese:'🥟 Chinese cuisine',
       korean:'🌶️ Korean cuisine',bold:'🔥 Bold & flavourful',light:'🥗 Healthy & light',
+      thai:'🇹🇭 Thai cuisine',esarn:'🌶️ E-Sarn flavours',thaifinedining:'👑 Thai fine dining',
+      rooftop:'🌆 Rooftop dining',
     };
+    const labelsTH = {
+      malaysian:'🇲🇾 อาหารมาเลเซีย',japanese:'🍱 อาหารญี่ปุ่น',
+      western:'🥩 อาหารตะวันตก',chinese:'🥟 อาหารจีน',
+      korean:'🌶️ อาหารเกาหลี',bold:'🔥 รสจัด จัดเต็ม',light:'🥗 เบาๆ เพื่อสุขภาพ',
+      thai:'🇹🇭 อาหารไทย',esarn:'🌶️ อาหารอีสาน',thaifinedining:'👑 ไฟน์ไดนิ่งไทย',
+      rooftop:'🌆 บนดาดฟ้า',
+    };
+    const labels = t(labelsEN, labelsTH);
     if (S.craving === 'light') {
       if (r.healthy) tags.push(labels.light);
     } else {
@@ -1626,6 +1725,10 @@ function buildReasons(r) {
         chinese:['Chinese','Taiwanese','Dim Sum','Fujian','Hotpot'],
         korean:['Korean'],
         bold:['Thai','Korean','Peri-Peri','Nashville','Wagyu','BBQ','Spicy','Hotpot'],
+        thai:['Thai','Street Food','Royal Thai','Food Court'],
+        esarn:['Northeastern','E-sarn','Isaan'],
+        thaifinedining:['Modern Thai','Royal Thai','Southern Thai'],
+        rooftop:['Rooftop'],
       };
       const keys = cMap[S.craving] || [];
       if (keys.some(k => r.cuisine.toLowerCase().includes(k.toLowerCase())))
@@ -1634,40 +1737,40 @@ function buildReasons(r) {
   }
 
   // Dietary requirements met
-  if (S.dietary.includes('halal') && r.halal) tags.push('✅ Halal certified');
-  if (S.dietary.includes('vegetarian') && r.veg) tags.push('🥦 Vegetarian options');
-  if (S.dietary.includes('vegan') && r.vegan) tags.push('🌱 Vegan friendly');
-  if (S.dietary.includes('no-beef') && r.noBeef) tags.push('🥩 No beef accommodated');
-  if (S.dietary.includes('gluten-free') && r.gfFriendly) tags.push('🌾 Lower gluten risk');
-  if (S.dietary.includes('kosher') && (r.veg || r.vegan)) tags.push('🥦 Best kosher-proxy option');
+  if (S.dietary.includes('halal') && r.halal) tags.push(t('✅ Halal certified','✅ ฮาลาล'));
+  if (S.dietary.includes('vegetarian') && r.veg) tags.push(t('🥦 Vegetarian options','🥦 มีเมนูมังสวิรัติ'));
+  if (S.dietary.includes('vegan') && r.vegan) tags.push(t('🌱 Vegan friendly','🌱 เหมาะกับวีแกน'));
+  if (S.dietary.includes('no-beef') && r.noBeef) tags.push(t('🥩 No beef accommodated','🥩 ไม่มีเนื้อวัว'));
+  if (S.dietary.includes('gluten-free') && r.gfFriendly) tags.push(t('🌾 Lower gluten risk','🌾 ความเสี่ยงกลูเตนต่ำ'));
+  if (S.dietary.includes('kosher') && (r.veg || r.vegan)) tags.push(t('🥦 Best kosher-proxy option','🥦 ตัวเลือกใกล้เคียงโคเชอร์'));
 
   // Very close to office
-  if (r.walkMin && r.walkMin <= 5) tags.push(`🚶 ${r.walkMin} min from your desk`);
+  if (r.walkMin && r.walkMin <= 5) tags.push(t(`🚶 ${r.walkMin} min from your desk`,`🚶 ${r.walkMin} นาทีจากออฟฟิศ`));
 
   // Occasion fit
   if (S.occasion === 'overseas-guests' && r.bestFor.includes('overseas-guests'))
-    tags.push('🌍 Guest-worthy experience');
+    tags.push(t('🌍 Guest-worthy experience','🌍 เหมาะรับรองแขกต่างชาติ'));
   if (S.occasion === 'team-outing' && r.bestFor.includes('team-outing'))
-    tags.push('👥 Great for team outings');
+    tags.push(t('👥 Great for team outings','👥 เหมาะกับทีม'));
 
   // Vibe match
-  if (S.vibe === 'chill' && r.vibe === 'chill') tags.push('🔇 Quiet — easy to talk');
-  if (S.vibe === 'moderate' && r.vibe === 'moderate') tags.push('🎵 Good energy');
+  if (S.vibe === 'chill' && r.vibe === 'chill') tags.push(t('🔇 Quiet — easy to talk','🔇 เงียบ คุยงานง่าย'));
+  if (S.vibe === 'moderate' && r.vibe === 'moderate') tags.push(t('🎵 Good energy','🎵 บรรยากาศดี'));
 
   // Group size
-  if (S.groupSize >= 6 && r.capacity === 'large') tags.push('👥 Handles large groups');
+  if (S.groupSize >= 6 && r.capacity === 'large') tags.push(t('👥 Handles large groups','👥 รองรับกลุ่มใหญ่'));
 
   // Budget fit
-  if (S.budget === 'low' && r.priceNum <= 15) tags.push('💰 Very affordable');
-  if (S.budget === 'splurge' && r.priceNum >= 150) tags.push('👑 Premium experience');
+  if (S.budget === 'low' && r.priceNum <= 15) tags.push(t('💰 Very affordable','💰 ราคาย่อมเยามาก'));
+  if (S.budget === 'splurge' && r.priceNum >= 150) tags.push(t('👑 Premium experience','👑 ระดับพรีเมียม'));
 
   // Rating confidence (only fill if not already rich with reasons)
   if (r.googleRating >= 4.5 && tags.length < 2)
-    tags.push(`⭐ ${r.googleRating} on Google (${r.reviews} reviews)`);
+    tags.push(t(`⭐ ${r.googleRating} on Google (${r.reviews} reviews)`,`⭐ ${r.googleRating} บน Google (${r.reviews} รีวิว)`));
 
   // Trending (only if strong signal)
   if (r.trending.length >= 3 && tags.length < 3)
-    tags.push('🔥 Trending across platforms');
+    tags.push(t('🔥 Trending across platforms','🔥 กำลังเป็นที่นิยม'));
 
   return tags.slice(0, 4);
 }
@@ -1717,7 +1820,7 @@ function buildCard(r, isDinner=false) {
 
   const reasons = buildReasons(r);
   const whyHtml = reasons.length
-    ? `<div class="why-picks"><div class="why-label">Why this pick</div><div>${reasons.map(t=>`<span class="why-tag">${t}</span>`).join('')}</div></div>`
+    ? `<div class="why-picks"><div class="why-label">${t('Why this pick','ทำไมถึงแนะนำ')}</div><div>${reasons.map(tag=>`<span class="why-tag">${tag}</span>`).join('')}</div></div>`
     : '';
 
   const menuMeta = getMenuLink(r.id);
@@ -1779,8 +1882,10 @@ function buildDishCard(r, specialtyNote) {
 async function runDishSearch(query) {
   const match = matchDish(query);
   if (!match) {
-    await botSay(`I don't have a specific match for <strong>"${query}"</strong> yet — but let me find the closest options based on cuisine. You can also try a broader term like the cuisine type.`, 700);
-    // Fallback to normal suggest
+    await botSay(t(
+      `I don't have a specific match for <strong>"${query}"</strong> yet — but let me find the closest options based on cuisine. You can also try a broader term like the cuisine type.`,
+      `ยังไม่มีข้อมูลเฉพาะสำหรับ <strong>"${query}"</strong> — แต่เราจะหาร้านที่ใกล้เคียงที่สุดให้`
+    ), 700);
     await showResults();
     return;
   }
@@ -1789,14 +1894,20 @@ async function runDishSearch(query) {
   const candidates = DB.filter(r => validIds.includes(r.id));
 
   if (!candidates.length) {
-    await botSay(`I know of places for <strong>${query}</strong> but they might not match your current filters (area / dietary). Try broadening your area preference.`, 700);
+    await botSay(t(
+      `I know of places for <strong>${query}</strong> but they might not match your current filters (area / dietary). Try broadening your area preference.`,
+      `รู้จักร้านที่ทำ <strong>${query}</strong> แต่อาจไม่ตรงกับกรองของคุณ ลองขยายพื้นที่ดูนะ`
+    ), 700);
     await showFeedback(); return;
   }
 
   S.step = 'result';
   S.last = candidates;
 
-  await botSay(`Found <strong>${candidates.length}</strong> restaurant${candidates.length > 1 ? 's' : ''} specifically known for <strong>${query}</strong> 👇`, 700);
+  await botSay(t(
+    `Found <strong>${candidates.length}</strong> restaurant${candidates.length > 1 ? 's' : ''} specifically known for <strong>${query}</strong> 👇`,
+    `พบ <strong>${candidates.length}</strong> ร้านที่ขึ้นชื่อเรื่อง <strong>${query}</strong> 👇`
+  ), 700);
 
   for (const r of candidates) {
     await new Promise(ok => setTimeout(ok, 350));
@@ -1804,7 +1915,7 @@ async function runDishSearch(query) {
     addCard(buildDishCard(r, note));
   }
 
-  await botSay("These spots are specifically known for that dish. Happy with the options?", 700);
+  await botSay(t("These spots are specifically known for that dish. Happy with the options?","ร้านพวกนี้ขึ้นชื่อเรื่องเมนูนั้นเป็นพิเศษ ถูกใจไหม?"), 700);
   await showFeedback();
 }
 
@@ -1855,26 +1966,33 @@ async function onQR(label,value) {
     if(!S.dietary.includes(value)) S.dietary.push(value);
     addMsg(label,'user'); qrEl.innerHTML='';
     if (value === 'kosher') {
-      await botSay("Noted. Heads up: <strong>certified Kosher restaurants are extremely rare in Klang Valley</strong> — there are essentially none. We'll surface strictly vegetarian and vegan-friendly options as the most practical alternative. Please confirm with your guest what they're comfortable with. 🙏", 700);
+      await botSay(t(
+        "Noted. Heads up: <strong>certified Kosher restaurants are extremely rare in Klang Valley</strong> — there are essentially none. We'll surface strictly vegetarian and vegan-friendly options as the most practical alternative. Please confirm with your guest what they're comfortable with. 🙏",
+        "รับทราบ ⚠️ <strong>ร้านอาหารที่ได้รับการรับรองโคเชอร์แทบไม่มีในกรุงเทพ</strong> — เราจะแนะนำตัวเลือกมังสวิรัติ/วีแกนแทน กรุณาตรวจสอบกับแขกของคุณด้วยนะคะ 🙏"
+      ), 700);
     } else if (value === 'gluten-free') {
-      await botSay("⚠️ <strong>Gluten hides in many Malaysian dishes</strong> — soy sauce, oyster sauce, wheat noodles, and marinades are everywhere. We'll prioritise the safest options, but please always confirm with the restaurant. Cross-contamination is a real risk in shared kitchens.", 700);
+      await botSay(t(
+        "⚠️ <strong>Gluten hides in many Malaysian dishes</strong> — soy sauce, oyster sauce, wheat noodles, and marinades are everywhere. We'll prioritise the safest options, but please always confirm with the restaurant. Cross-contamination is a real risk in shared kitchens.",
+        "⚠️ <strong>กลูเตนซ่อนอยู่ในอาหารหลายอย่าง</strong> — ซีอิ๊ว น้ำมันหอย เส้นสาลี เราจะเลือกตัวเลือกที่ปลอดภัยที่สุด แต่กรุณายืนยันกับร้านด้วยนะคะ การปนเปื้อนข้ามยังเป็นความเสี่ยงในครัวทั่วไป"
+      ), 700);
     } else {
-      await botSay("Noted! Any other dietary needs?", 400);
+      await botSay(t("Noted! Any other dietary needs?","รับทราบ! มีข้อจำกัดอื่นอีกไหม?"), 400);
     }
-    setQR([
-      {l:"✅ Halal required",v:"halal"},{l:"🌱 Vegan",v:"vegan"},
-      {l:"🥦 Vegetarian",v:"vegetarian"},{l:"🚫 No pork/No lard",v:"no-pork"},
-      {l:"🥩 No beef",v:"no-beef"},{l:"🌾 Gluten-free",v:"gluten-free"},
-      {l:"✡️ Kosher",v:"kosher"},{l:"✅ That's all, continue",v:"none"},
-    ]); return;
+    setQR(t(
+      [{l:"✅ Halal required",v:"halal"},{l:"🌱 Vegan",v:"vegan"},{l:"🥦 Vegetarian",v:"vegetarian"},{l:"🚫 No pork/No lard",v:"no-pork"},{l:"🥩 No beef",v:"no-beef"},{l:"🌾 Gluten-free",v:"gluten-free"},{l:"✡️ Kosher",v:"kosher"},{l:"✅ That's all, continue",v:"none"}],
+      [{l:"✅ ฮาลาล",v:"halal"},{l:"🌱 วีแกน",v:"vegan"},{l:"🥦 มังสวิรัติ",v:"vegetarian"},{l:"🚫 ไม่ทานหมู",v:"no-pork"},{l:"🥩 ไม่ทานเนื้อวัว",v:"no-beef"},{l:"🌾 หลีกเลี่ยงกลูเตน",v:"gluten-free"},{l:"✡️ โคเชอร์",v:"kosher"},{l:"✅ เพียงพอแล้ว ไปต่อ",v:"none"}]
+    )); return;
   }
 
   // Dish search branch
   if (value === 'dish-search') {
     addMsg(label,'user'); qrEl.innerHTML='';
     S.step = 'dish-search';
-    await botSay(`What dish are you after? Type it in and I'll find who does it best. 👇<br><small style="color:#9aa">e.g. nasi lemak, ramen, XLB, wagyu, ribs, laksa, mazesoba…</small>`, 600);
-    inpEl.placeholder = 'Type a dish name and press Enter…';
+    await botSay(t(
+      `What dish are you after? Type it in and I'll find who does it best. 👇<br><small style="color:#9aa">e.g. nasi lemak, ramen, XLB, wagyu, ribs, laksa, mazesoba…</small>`,
+      `อยากทานอะไร? พิมพ์ชื่อเมนูแล้วเราจะหาร้านที่ดีที่สุดให้ 👇<br><small style="color:#9aa">เช่น ข้าวมันไก่, ส้มตำ, ผัดไทย, สุกี้, ราเมน…</small>`
+    ), 600);
+    inpEl.placeholder = t('Type a dish name and press Enter…','พิมพ์ชื่อเมนู แล้วกด Enter…');
     inpEl.focus();
     return;
   }
@@ -1908,65 +2026,96 @@ async function advance() {
   await askStep(S.step);
 }
 
-const STEP_MSGS = {
-  groupSize:{msg:"How many people are we feeding?",qr:[{l:"Just me",v:"1"},{l:"2–4 pax",v:"3"},{l:"5–8 pax",v:"6"},{l:"9+ pax",v:"10"}]},
-  time:{msg:"How much time do you have?",qr:[{l:"⚡ Rushed (under 30 min)",v:"rushed"},{l:"🕐 Normal (~1 hour)",v:"normal"},{l:"😌 Relaxed (1.5 hr+)",v:"relaxed"}]},
-  dietary:{msg:"Any dietary requirements? (Tap all that apply)",qr:[{l:"✅ Halal required",v:"halal"},{l:"🌱 Vegan",v:"vegan"},{l:"🥦 Vegetarian",v:"vegetarian"},{l:"🚫 No pork / No lard",v:"no-pork"},{l:"🥩 No beef",v:"no-beef"},{l:"🌾 Gluten-free",v:"gluten-free"},{l:"✡️ Kosher",v:"kosher"},{l:"✅ No restrictions",v:"none"}]},
-  craving:{
-    lunch:{msg:"What are you craving?",qr:[{l:"🇲🇾 Malaysian local",v:"malaysian"},{l:"🍜 Japanese",v:"japanese"},{l:"🥩 Western / Grilled",v:"western"},{l:"🥟 Chinese / Dim Sum",v:"chinese"},{l:"🌶️ Bold & flavourful",v:"bold"},{l:"🥗 Healthy / Low-cal",v:"light"},{l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"}]},
-    dinner:{msg:"What kind of dinner are you after?",qr:[{l:"🇲🇾 Malaysian / Asian",v:"malaysian"},{l:"🍣 Japanese / Omakase",v:"japanese"},{l:"🥩 Western / French",v:"western"},{l:"🫕 Hotpot / BBQ",v:"bold"},{l:"🌶️ Thai / Korean",v:"korean"},{l:"🥗 Healthy / Light",v:"light"},{l:"✨ Surprise me",v:"any"},{l:"🔍 I want a specific dish…",v:"dish-search"}]},
-  },
-  budget:{
-    lunch:{msg:"Budget per person?",qr:[{l:"💰 Under RM20",v:"low"},{l:"💳 RM20–50",v:"mid"},{l:"💎 RM50+",v:"high"}]},
-    dinner:{msg:"Budget per person for dinner?",qr:[{l:"💳 RM50–100 (casual)",v:"mid"},{l:"💎 RM100–200 (premium)",v:"high"},{l:"👑 RM200+ (celebration!)",v:"splurge"}]},
-  },
-  vibe:{msg:"What kind of environment?",qr:[{l:"🔇 Quiet — easy to talk",v:"chill"},{l:"🎵 Some buzz is fine",v:"moderate"},{l:"🔊 Lively, don't care",v:"any"}]},
-};
-
 async function askStep(step) {
   const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  const isTH = S.country === 'th' && S.lang === 'th';
+
   if (step === 'craving') {
-    const qr  = S.mealType === 'dinner' ? cc.cravingDinner : cc.cravingLunch;
-    const msg = S.mealType === 'dinner' ? "What kind of dinner are you after?" : "What are you craving?";
+    let qr;
+    if (S.mealType === 'dinner') {
+      qr = (isTH && cc.cravingDinnerTH) ? cc.cravingDinnerTH : cc.cravingDinner;
+    } else {
+      qr = (isTH && cc.cravingLunchTH) ? cc.cravingLunchTH : cc.cravingLunch;
+    }
+    const msg = S.mealType === 'dinner'
+      ? t("What kind of dinner are you after?","อยากทานอะไรคืนนี้?")
+      : t("What are you craving?","อยากกินอะไร?");
     await botSay(msg, 650); setQR(qr); return;
   }
   if (step === 'budget') {
-    const qr  = S.mealType === 'dinner' ? cc.budgetDinnerQR : cc.budgetLunchQR;
-    const msg = S.mealType === 'dinner' ? "Budget per person for dinner?" : "Budget per person?";
+    let qr;
+    if (S.mealType === 'dinner') {
+      qr = (isTH && cc.budgetDinnerQRTH) ? cc.budgetDinnerQRTH : cc.budgetDinnerQR;
+    } else {
+      qr = (isTH && cc.budgetLunchQRTH) ? cc.budgetLunchQRTH : cc.budgetLunchQR;
+    }
+    const msg = S.mealType === 'dinner'
+      ? t("Budget per person for dinner?","งบประมาณต่อคนสำหรับมื้อเย็น?")
+      : t("Budget per person?","งบประมาณต่อคน?");
     await botSay(msg, 650); setQR(qr); return;
   }
-  const cfg = STEP_MSGS[step];
-  await botSay(cfg.msg, 650);
-  setQR(cfg.qr);
+  if (step === 'groupSize') {
+    await botSay(t("How many people are we feeding?","ทั้งหมดกี่คน?"), 650);
+    setQR(t(
+      [{l:"Just me",v:"1"},{l:"2–4 pax",v:"3"},{l:"5–8 pax",v:"6"},{l:"9+ pax",v:"10"}],
+      [{l:"คนเดียว",v:"1"},{l:"2–4 คน",v:"3"},{l:"5–8 คน",v:"6"},{l:"9+ คน",v:"10"}]
+    )); return;
+  }
+  if (step === 'time') {
+    await botSay(t("How much time do you have?","มีเวลาเท่าไหร่?"), 650);
+    setQR(t(
+      [{l:"⚡ Rushed (under 30 min)",v:"rushed"},{l:"🕐 Normal (~1 hour)",v:"normal"},{l:"😌 Relaxed (1.5 hr+)",v:"relaxed"}],
+      [{l:"⚡ รีบมาก (ไม่เกิน 30 นาที)",v:"rushed"},{l:"🕐 ปกติ (~1 ชั่วโมง)",v:"normal"},{l:"😌 ชิลล์ (1.5 ชม.+)",v:"relaxed"}]
+    )); return;
+  }
+  if (step === 'dietary') {
+    await botSay(t("Any dietary requirements? (Tap all that apply)","มีข้อจำกัดด้านอาหารไหม? (เลือกได้หลายข้อ)"), 650);
+    setQR(t(
+      [{l:"✅ Halal required",v:"halal"},{l:"🌱 Vegan",v:"vegan"},{l:"🥦 Vegetarian",v:"vegetarian"},{l:"🚫 No pork / No lard",v:"no-pork"},{l:"🥩 No beef",v:"no-beef"},{l:"🌾 Gluten-free",v:"gluten-free"},{l:"✡️ Kosher",v:"kosher"},{l:"✅ No restrictions",v:"none"}],
+      [{l:"✅ ฮาลาล",v:"halal"},{l:"🌱 วีแกน",v:"vegan"},{l:"🥦 มังสวิรัติ",v:"vegetarian"},{l:"🚫 ไม่ทานหมู",v:"no-pork"},{l:"🥩 ไม่ทานเนื้อวัว",v:"no-beef"},{l:"🌾 หลีกเลี่ยงกลูเตน",v:"gluten-free"},{l:"✡️ โคเชอร์",v:"kosher"},{l:"✅ ทานได้ทุกอย่าง",v:"none"}]
+    )); return;
+  }
+  if (step === 'vibe') {
+    await botSay(t("What kind of environment?","อยากได้บรรยากาศแบบไหน?"), 650);
+    setQR(t(
+      [{l:"🔇 Quiet — easy to talk",v:"chill"},{l:"🎵 Some buzz is fine",v:"moderate"},{l:"🔊 Lively, don't care",v:"any"}],
+      [{l:"🔇 เงียบ — คุยงานง่าย",v:"chill"},{l:"🎵 มีเสียงบ้างก็ได้",v:"moderate"},{l:"🔊 คึกคักก็ไม่เป็นไร",v:"any"}]
+    )); return;
+  }
 }
 
 async function askMealType() {
   const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
-  const dinnerSub = cc.mealTypeSub?.dinner || 'Wider city options';
-  await botSay("Is this for lunch, dinner, or do you want to order delivery?", 650);
+  const subCfg   = (S.lang === 'th' && cc.mealTypeSubTH) ? cc.mealTypeSubTH : cc.mealTypeSub;
+  const dinnerSub = subCfg?.dinner || t('Wider city options','ร้านอาหารทั่วเมือง');
+  await botSay(t("Is this for lunch, dinner, or do you want to order delivery?","ทานมื้อไหน หรือจะสั่งเดลิเวอรี่?"), 650);
   const mealTabsEl = document.createElement('div');
   mealTabsEl.className='meal-tabs';
   mealTabsEl.innerHTML=`
     <button class="mt-btn" onclick="pickMeal('lunch')">
       <span class="mt-icon">☀️</span>
-      <span class="mt-label">Lunch</span>
-      <span class="mt-sub">Walk-in / drive nearby</span>
+      <span class="mt-label">${t('Lunch','กลางวัน')}</span>
+      <span class="mt-sub">${t('Walk-in / drive nearby','เดินหรือขับรถใกล้ๆ')}</span>
     </button>
     <button class="mt-btn" onclick="pickMeal('dinner')">
       <span class="mt-icon">🌙</span>
-      <span class="mt-label">Dinner</span>
+      <span class="mt-label">${t('Dinner','เย็น')}</span>
       <span class="mt-sub">${dinnerSub}</span>
     </button>
     <button class="mt-btn grab" onclick="pickMeal('grab-delivery')">
       <span class="mt-icon">🛵</span>
-      <span class="mt-label">Delivery</span>
+      <span class="mt-label">${t('Delivery','เดลิเวอรี่')}</span>
       <span class="mt-sub">${cc.deliveryPlatform}</span>
     </button>`;
   qrEl.appendChild(mealTabsEl);
 }
 
 window.pickMeal = async function(val) {
-  const labels = {'lunch':'☀️ Lunch — dine in','dinner':'🌙 Dinner — dine in','grab-delivery':'🛵 Grab Delivery'};
+  const labels = {
+    'lunch':         t('☀️ Lunch — dine in',      '☀️ กลางวัน — นั่งทาน'),
+    'dinner':        t('🌙 Dinner — dine in',      '🌙 เย็น — นั่งทาน'),
+    'grab-delivery': t('🛵 Grab Delivery',          '🛵 เดลิเวอรี่'),
+  };
   addMsg(labels[val],'user'); qrEl.innerHTML='';
   S.mealType = val; S.step = 'mealType';
   await advance();
@@ -1979,14 +2128,20 @@ async function askWalkIn() {
     return s.status === 'closed' || s.status === 'not-yet';
   }).length;
 
-  await botSay(`Are you heading out soon, or planning ahead?${nowOpen > 0 ? `<br><small style="color:#9aa">ℹ️ ${nowOpen} spots are currently closed or not yet open — I'll filter those automatically.</small>` : ''}`, 650);
+  const closedNote = nowOpen > 0
+    ? `<br><small style="color:#9aa">ℹ️ ${t(
+        `${nowOpen} spots are currently closed or not yet open — I'll filter those automatically.`,
+        `ขณะนี้ปิดหรือยังไม่เปิด ${nowOpen} ร้าน — ระบบจะกรองออกให้อัตโนมัติ`
+      )}</small>`
+    : '';
+  await botSay(`${t('Are you heading out soon, or planning ahead?','จะออกไปเดี๋ยวนี้ หรือวางแผนล่วงหน้า?')}${closedNote}`, 650);
   setQR([
-    {l:'🚀 Heading there soon — walk-in', v:'now', fn: async () => {
-      addMsg('🚀 Walk-in — heading there soon','user'); qrEl.innerHTML='';
+    {l: t('🚀 Heading there soon — walk-in','🚀 ไปเดี๋ยวนี้เลย — walk-in'), v:'now', fn: async () => {
+      addMsg(t('🚀 Walk-in — heading there soon','🚀 ไปเดี๋ยวนี้เลย'),'user'); qrEl.innerHTML='';
       S.planningAhead='now'; S.step='walkInOrPlan'; await advance();
     }},
-    {l:'📅 Planning ahead / making a booking', v:'ahead', fn: async () => {
-      addMsg('📅 Planning ahead','user'); qrEl.innerHTML='';
+    {l: t('📅 Planning ahead / making a booking','📅 วางแผนล่วงหน้า / จองโต๊ะ'), v:'ahead', fn: async () => {
+      addMsg(t('📅 Planning ahead','📅 วางแผนล่วงหน้า'),'user'); qrEl.innerHTML='';
       S.planningAhead='ahead'; S.step='walkInOrPlan'; await advance();
     }},
   ]);
@@ -1995,29 +2150,34 @@ async function askWalkIn() {
 async function askAreaPref() {
   const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
   const isLunch = S.mealType === 'lunch';
-  const msg = isLunch ? cc.lunchAreaMsg : cc.dinnerAreaMsg;
-  const qrItems = (isLunch ? cc.lunchAreaQR : cc.dinnerAreaQR)
-    .map(item => ({...item, fn: pickArea}));
+  const isTH = S.country === 'th' && S.lang === 'th';
+  const msg = isLunch
+    ? (isTH && cc.lunchAreaMsgTH ? cc.lunchAreaMsgTH : cc.lunchAreaMsg)
+    : (isTH && cc.dinnerAreaMsgTH ? cc.dinnerAreaMsgTH : cc.dinnerAreaMsg);
+  const qrBase = isLunch
+    ? (isTH && cc.lunchAreaQRTH ? cc.lunchAreaQRTH : cc.lunchAreaQR)
+    : (isTH && cc.dinnerAreaQRTH ? cc.dinnerAreaQRTH : cc.dinnerAreaQR);
+  const qrItems = qrBase.map(item => ({...item, fn: pickArea}));
   await botSay(msg, 650);
   setQR(qrItems);
 }
 
 window.pickArea = async function(val) {
   const allLabels = {
-    // Malaysia
+    // Malaysia (EN only)
     'one-utama-only':'🏬 One Utama / First Avenue',
     'avoid-one-utama':'🚗 Nearby streets (no 1U)',
     'any-nearby':'🗺️ Any nearby area',
     'pj-nearby':'🏘️ Staying nearby PJ',
     'mid-kl':'🌆 Bangsar / KL area',
     'anywhere':'🌃 Anywhere in KL Valley',
-    // Thailand
+    // Thailand EN
     'terminal21-onebkk':'🏬 Terminal 21 / One Bangkok',
-    'lumpini-silom':'🌳 Lumpini / Silom direction',
-    'any-nearby-th':'🗺️ Any nearby area',
-    'th-nearby':'🏙️ Nearby (Asoke / Silom / Sathorn)',
-    'th-midrange':'🌆 Mid (Thonglor / Riverside / Nana)',
-    'th-anywhere':'🌃 Anywhere in Bangkok',
+    'lumpini-silom':    t('🌳 Lumpini / Silom direction','🌳 ทิศลุมพินี / สีลม'),
+    'any-nearby-th':    t('🗺️ Any nearby area','🗺️ บริเวณใกล้เคียง'),
+    'th-nearby':        t('🏙️ Nearby (Asoke / Silom / Sathorn)','🏙️ ใกล้ (อโศก / สีลม / สาทร)'),
+    'th-midrange':      t('🌆 Mid (Thonglor / Riverside / Nana)','🌆 กลาง (ทองหล่อ / ริเวอร์ไซด์ / นานา)'),
+    'th-anywhere':      t('🌃 Anywhere in Bangkok','🌃 ทั่วกรุงเทพ'),
   };
   addMsg(allLabels[val]||val, 'user'); qrEl.innerHTML='';
   S.areaFilter = val; S.step = 'areaPreference';
@@ -2027,28 +2187,42 @@ window.pickArea = async function(val) {
 // ─── Grab sub-flow ────────────────────────────────────────────────────────────
 async function askGrabFlow() {
   const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
-  await botSay(cc.grabMsg, 650);
-  setQR([
-    {l:"✅ Halal only",v:"halal",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
-    {l:"🌱 Vegan",v:"vegan",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
-    {l:"🥦 Vegetarian",v:"vegetarian",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
-    {l:"🥩 No beef",v:"no-beef",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
-    {l:"No restrictions",v:"none",fn:v=>{S.step='grab-dietary';advance();}},
-  ], true);
+  const msg = (S.lang === 'th' && cc.grabMsgTH) ? cc.grabMsgTH : cc.grabMsg;
+  await botSay(msg, 650);
+  setQR(t(
+    [
+      {l:"✅ Halal only",v:"halal",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"🌱 Vegan",v:"vegan",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"🥦 Vegetarian",v:"vegetarian",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"🥩 No beef",v:"no-beef",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"No restrictions",v:"none",fn:v=>{S.step='grab-dietary';advance();}},
+    ],
+    [
+      {l:"✅ ฮาลาลเท่านั้น",v:"halal",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"🌱 วีแกน",v:"vegan",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"🥦 มังสวิรัติ",v:"vegetarian",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"🥩 ไม่ทานเนื้อวัว",v:"no-beef",fn:v=>{S.dietary=[v];S.step='grab-dietary';advance();}},
+      {l:"ทานได้ทุกอย่าง",v:"none",fn:v=>{S.step='grab-dietary';advance();}},
+    ]
+  ), true);
 }
 async function askGrabCraving() {
-  await botSay("What are you craving?", 500);
-  setQR([
-    {l:"🇲🇾 Malaysian",v:"malaysian"},{l:"🍜 Japanese",v:"japanese"},
-    {l:"🥩 Western",v:"western"},{l:"🌶️ Bold & flavourful",v:"bold"},
-    {l:"✨ Surprise me",v:"any"},
-  ], true);
+  await botSay(t("What are you craving?","อยากกินอะไร?"), 500);
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  const isTH = S.country === 'th' && S.lang === 'th';
+  const qr = isTH
+    ? [{l:"🇹🇭 อาหารไทย",v:"thai"},{l:"🍜 ญี่ปุ่น",v:"japanese"},{l:"🥩 ตะวันตก",v:"western"},{l:"🌶️ รสจัด",v:"bold"},{l:"✨ เซอร์ไพรส์",v:"any"}]
+    : [{l:"🇲🇾 Malaysian",v:"malaysian"},{l:"🍜 Japanese",v:"japanese"},{l:"🥩 Western",v:"western"},{l:"🌶️ Bold & flavourful",v:"bold"},{l:"✨ Surprise me",v:"any"}];
+  setQR(qr, true);
 }
 async function askGrabBudget() {
-  await botSay("Budget per order?", 500);
-  setQR([
-    {l:"💰 Under RM20",v:"low"},{l:"💳 RM20–40",v:"mid"},{l:"💎 RM40+",v:"high"},
-  ], true);
+  const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
+  const isTH = S.country === 'th' && S.lang === 'th';
+  await botSay(t("Budget per order?","งบประมาณต่อออร์เดอร์?"), 500);
+  const qr = isTH
+    ? [{l:"💰 <฿100",v:"low"},{l:"💳 ฿100–300",v:"mid"},{l:"💎 ฿300+",v:"high"}]
+    : [{l:"💰 Under RM20",v:"low"},{l:"💳 RM20–40",v:"mid"},{l:"💎 RM40+",v:"high"}];
+  setQR(qr, true);
 }
 
 async function showGrabResults() {
@@ -2060,11 +2234,11 @@ async function showGrabResults() {
     if (!S.shownCuisines.includes(c)) S.shownCuisines.push(c);
   });
   if (!res.length) {
-    await botSay("I couldn't find a Grab match with those filters. Let me broaden — relaxing dietary filter slightly.", 700);
+    await botSay(t("I couldn't find a Grab match with those filters. Let me broaden — relaxing dietary filter slightly.","ไม่พบร้านที่ตรงกับเงื่อนไขของคุณ ลองขยายเงื่อนไขดูนะ"), 700);
   }
-  await botSay("Here are your best Grab delivery picks 🛵 Search these in the Grab app for live ETA and promos:", 700);
+  await botSay(t("Here are your best Grab delivery picks 🛵 Search these in the Grab app for live ETA and promos:","นี่คือตัวเลือกเดลิเวอรี่ที่ดีที่สุด 🛵 ค้นหาชื่อร้านในแอป Grab:"), 700);
   addCard(buildGrabPanel(res));
-  await botSay("Open Grab Food, search by restaurant name, and check for any active promo codes under the checkout screen.", 800);
+  await botSay(t("Open Grab Food, search by restaurant name, and check for any active promo codes under the checkout screen.","เปิด GrabFood ค้นหาชื่อร้าน แล้วเช็คโค้ดส่วนลดในหน้าชำระเงิน"), 800);
   await showFeedback();
 }
 
@@ -2084,15 +2258,21 @@ async function showResults() {
   if (!res.length) {
     const exhausted = S.shown.length > 0;
     await botSay(exhausted
-      ? "We've surfaced all the strong matches for your criteria — nothing genuinely new left. Try relaxing a filter or tap <strong>Start over</strong> for a fresh search."
-      : "Hmm, nothing matched well with all those filters — let me adjust.", 700);
+      ? t("We've surfaced all the strong matches for your criteria — nothing genuinely new left. Try relaxing a filter or tap <strong>Start over</strong> for a fresh search.","เราแนะนำร้านที่ดีที่สุดทั้งหมดแล้ว ลองผ่อนคลายเงื่อนไข หรือกด <strong>เริ่มใหม่</strong>")
+      : t("Hmm, nothing matched well with all those filters — let me adjust.","ไม่มีร้านที่ตรงทุกเงื่อนไข — ลองปรับดูนะ"), 700);
     await showFeedback(); return;
   }
 
   const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
-  const occLabel = {'overseas-guests':'for your guests','team-outing':'for the team','daily-lunch':'for you today'}[S.occasion]||'';
+  const occLabel = t(
+    {'overseas-guests':'for your guests','team-outing':'for the team','daily-lunch':'for you today'}[S.occasion]||'',
+    {'overseas-guests':'สำหรับแขกของคุณ','team-outing':'สำหรับทีม','daily-lunch':'สำหรับคุณวันนี้'}[S.occasion]||''
+  );
   const ratingNote = S.country === 'th' ? 'Google & Wongnai' : 'Google';
-  await botSay(`Here are my top picks ${occLabel} — all <strong>⭐ 4.0+ rated on ${ratingNote}</strong> ${isDinner?'🌙':'☀️'}`, 700);
+  await botSay(t(
+    `Here are my top picks ${occLabel} — all <strong>⭐ 4.0+ rated on ${ratingNote}</strong> ${isDinner?'🌙':'☀️'}`,
+    `นี่คือตัวเลือกที่ดีที่สุด${occLabel} — ทุกร้านได้ <strong>⭐ 4.0+ บน ${ratingNote}</strong> ${isDinner?'🌙':'☀️'}`
+  ), 700);
 
   if (PEAK.level !== 'green') {
     await botSay(`<strong>${PEAK.label}</strong> — ${PEAK.note}`, 450);
@@ -2103,42 +2283,58 @@ async function showResults() {
     addCard(buildCard(r, isDinner));
   }
 
-  await botSay("What do you think? Hit the spot?", 700);
+  await botSay(t("What do you think? Hit the spot?","เป็นยังไงบ้าง? ถูกใจไหม?"), 700);
   await showFeedback();
 }
 
 async function showFeedback() {
   S.step='feedback';
-  setQR([
-    {l:"✅ Perfect, thanks!",v:"happy",fn:onFeedback},
-    {l:"🔍 Search a different dish",v:"dish-search-again",fn:onFeedback},
-    {l:"📍 Too far away",v:"too-far",fn:onFeedback},
-    {l:"💸 Too expensive",v:"too-expensive",fn:onFeedback},
-    {l:"🔊 Too noisy",v:"too-noisy",fn:onFeedback},
-    {l:"🔇 Too quiet",v:"too-quiet",fn:onFeedback},
-    {l:"🍽️ Different cuisine",v:"different-cuisine",fn:onFeedback},
-    {l:"💰 Something cheaper",v:"want-cheaper",fn:onFeedback},
-    {l:"🔄 Start over",v:"reset",fn:onFeedback},
-  ]);
+  setQR(t(
+    [
+      {l:"✅ Perfect, thanks!",v:"happy",fn:onFeedback},
+      {l:"🔍 Search a different dish",v:"dish-search-again",fn:onFeedback},
+      {l:"📍 Too far away",v:"too-far",fn:onFeedback},
+      {l:"💸 Too expensive",v:"too-expensive",fn:onFeedback},
+      {l:"🔊 Too noisy",v:"too-noisy",fn:onFeedback},
+      {l:"🔇 Too quiet",v:"too-quiet",fn:onFeedback},
+      {l:"🍽️ Different cuisine",v:"different-cuisine",fn:onFeedback},
+      {l:"💰 Something cheaper",v:"want-cheaper",fn:onFeedback},
+      {l:"🔄 Start over",v:"reset",fn:onFeedback},
+    ],
+    [
+      {l:"✅ เยี่ยม ขอบคุณ!",v:"happy",fn:onFeedback},
+      {l:"🔍 ค้นหาเมนูที่ต้องการ",v:"dish-search-again",fn:onFeedback},
+      {l:"📍 ไกลเกินไป",v:"too-far",fn:onFeedback},
+      {l:"💸 แพงเกินไป",v:"too-expensive",fn:onFeedback},
+      {l:"🔊 เสียงดังเกินไป",v:"too-noisy",fn:onFeedback},
+      {l:"🔇 เงียบเกินไป",v:"too-quiet",fn:onFeedback},
+      {l:"🍽️ อยากได้อาหารประเภทอื่น",v:"different-cuisine",fn:onFeedback},
+      {l:"💰 อยากได้ถูกกว่านี้",v:"want-cheaper",fn:onFeedback},
+      {l:"🔄 เริ่มใหม่",v:"reset",fn:onFeedback},
+    ]
+  ));
 }
 
 async function onFeedback(value) {
   if (value==='dish-search-again') {
-    addMsg('🔍 Search a different dish','user'); qrEl.innerHTML='';
+    addMsg(t('🔍 Search a different dish','🔍 ค้นหาเมนูที่ต้องการ'),'user'); qrEl.innerHTML='';
     S.step = 'dish-search';
-    await botSay(`What dish are you looking for this time? 👇<br><small style="color:#9aa">e.g. ramen, XLB, wagyu, ribs, laksa…</small>`, 500);
-    inpEl.placeholder = 'Type a dish name and press Enter…';
+    await botSay(t(
+      `What dish are you looking for this time? 👇<br><small style="color:#9aa">e.g. ramen, XLB, wagyu, ribs, laksa…</small>`,
+      `คราวนี้อยากทานอะไร? 👇<br><small style="color:#9aa">เช่น ส้มตำ, ผัดไทย, สุกี้, ข้าวมันไก่…</small>`
+    ), 500);
+    inpEl.placeholder = t('Type a dish name and press Enter…','พิมพ์ชื่อเมนู แล้วกด Enter…');
     inpEl.focus(); return;
   }
   if (value==='happy') {
-    await botSay("Enjoy! 🙌 Come back anytime for your next food fix.", 600);
+    await botSay(t("Enjoy! 🙌 Come back anytime for your next food fix.","สนุกกับมื้ออาหารนะ! 🙌 แวะมาใหม่ได้เสมอ"), 600);
     const w=document.createElement('div'); w.className='reset-wrap';
-    w.innerHTML=`<button class="reset-btn" onclick="resetChat()">🔄 Find food again</button>`;
+    w.innerHTML=`<button class="reset-btn" onclick="resetChat()">${t('🔄 Find food again','🔄 ค้นหาอาหารอีกครั้ง')}</button>`;
     chatEl.appendChild(w); scroll(); return;
   }
   if (value==='reset') { resetChat(); return; }
   S.rejections.push(value);
-  const msgs={
+  const msgsEN={
     'too-far':'Keeping it closer this time.',
     'too-expensive':'Looking for better value.',
     'too-noisy':'Finding somewhere quieter.',
@@ -2146,7 +2342,15 @@ async function onFeedback(value) {
     'different-cuisine':'Switching cuisine direction.',
     'want-cheaper':'Going budget-friendly.',
   };
-  await botSay(msgs[value]||"Let me re-think.", 600);
+  const msgsTH={
+    'too-far':'หาร้านใกล้ขึ้นให้นะ',
+    'too-expensive':'หาตัวเลือกที่คุ้มค่ากว่านี้',
+    'too-noisy':'หาที่เงียบกว่านี้ให้',
+    'too-quiet':'หาที่คึกคักกว่านี้',
+    'different-cuisine':'เปลี่ยนประเภทอาหาร',
+    'want-cheaper':'หาราคาย่อมเยากว่านี้',
+  };
+  await botSay(t(msgsEN[value]||"Let me re-think.", msgsTH[value]||"ลองหาใหม่นะ"), 600);
   if (S.mealType==='grab-delivery') await showGrabResults();
   else await showResults();
 }
@@ -2175,15 +2379,16 @@ function handleSend() {
     else if(lv.match(/cheap|budget|less money/))val='want-cheaper';
     onFeedback(val); return;
   }
-  botSay("Use the buttons for best results! Let me re-show the options:",500)
-    .then(()=>{ if(STEP_MSGS[S.step]) askStep(S.step); });
+  botSay(t("Use the buttons for best results! Let me re-show the options:","กดปุ่มจะได้ผลดีที่สุดนะ! ขอแสดงตัวเลือกใหม่อีกครั้ง:"),500)
+    .then(()=>{ if(S.step && ['craving','budget','groupSize','time','dietary','vibe'].includes(S.step)) askStep(S.step); });
 }
 inpEl.addEventListener('keydown',e=>{ if(e.key==='Enter') handleSend(); });
 
 // ─── Reset & init ─────────────────────────────────────────────────────────────
 function resetChat() {
-  S={step:'country',country:null,occasion:null,mealType:null,planningAhead:null,areaFilter:null,groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]};
-  chatEl.innerHTML=''; qrEl.innerHTML=''; startChat();
+  const prevLang = S && S.lang ? S.lang : 'en';
+  S={step:'country',country:null,lang:prevLang,occasion:null,mealType:null,planningAhead:null,areaFilter:null,groupSize:null,time:null,dietary:[],craving:null,budget:null,vibe:null,last:[],shown:[],shownCuisines:[],rejections:[],excluded:[]};
+  chatEl.innerHTML=''; qrEl.innerHTML=''; updateLangToggle(); startChat();
 }
 
 async function startChat() {
@@ -2222,22 +2427,29 @@ window.pickCountry = async function(code) {
   const label = `${cc.flag} ${cc.name} — ${cc.office}`;
   addMsg(label, 'user'); qrEl.innerHTML = '';
   S.country = code; S.step = 'country';
+  // Reset lang to 'en' when picking a new country (askLanguage will re-set it for TH)
+  if (code !== 'th') S.lang = 'en';
   // Update header subtitle dynamically
   const subEl = document.querySelector('.hdr-info p');
   if (subEl) subEl.textContent = `${cc.flag} ${cc.name} · ${cc.office}`;
-  await advance();
+  updateLangToggle();
+  if (code === 'th') {
+    await askLanguage();
+  } else {
+    await advance();
+  }
 };
 
 async function askOccasion() {
   const cc = COUNTRY_CONFIG[S.country] || COUNTRY_CONFIG.my;
-  const hook = cc.hooks[new Date().getDay() % cc.hooks.length];
-  await botSay(`${hook}<br><br>${PEAK.level!=='green'?`<span style="font-weight:600">${PEAK.label}</span> — ${PEAK.note}<br><br>`:''}What's the occasion today?`, 700);
+  const hooksArr = (S.country === 'th' && S.lang === 'th' && cc.hooksTH) ? cc.hooksTH : cc.hooks;
+  const hook = hooksArr[new Date().getDay() % hooksArr.length];
+  await botSay(`${hook}<br><br>${PEAK.level!=='green'?`<span style="font-weight:600">${PEAK.label}</span> — ${PEAK.note}<br><br>`:''}${t("What's the occasion today?","วันนี้มาทานกับใคร?")}`, 700);
   S.step = 'occasion';
-  setQR([
-    {l:"🌍 Hosting overseas guests", v:"overseas-guests"},
-    {l:"👥 Team lunch / outing",      v:"team-outing"},
-    {l:"🍜 Personal lunch / dinner",  v:"daily-lunch"},
-  ]);
+  setQR(t(
+    [{l:"🌍 Hosting overseas guests",v:"overseas-guests"},{l:"👥 Team lunch / outing",v:"team-outing"},{l:"🍜 Personal lunch / dinner",v:"daily-lunch"}],
+    [{l:"🌍 รับรองแขกต่างชาติ",v:"overseas-guests"},{l:"👥 ทานกับทีม / ออกไปกินข้าว",v:"team-outing"},{l:"🍜 ทานส่วนตัว",v:"daily-lunch"}]
+  ));
 }
 
 startChat();
