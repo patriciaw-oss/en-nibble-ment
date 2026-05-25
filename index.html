@@ -1321,7 +1321,7 @@ Lot 1A Exchange Road corner Jade Street<br>
 Ortigas Center, Pasig City, Philippines<br><br>
 🍽️ <strong>How we pick lunch</strong> — walk or short drive only: convenience (Lawson, Uncle John’s ~1–2 min) and fast food (Jollibee, McDonald’s, KFC ~5–7 min).<br><br>
 🌙 <strong>Dinner</strong> — you can widen to Ortigas malls, BGC, Makati, and beyond; budget tiers go past the casual <strong>₱150–300</strong> band when you want a splurge.<br><br>
-🔎 <strong>Discovery</strong> — we weight <strong>TikTok</strong>, <strong>Google Maps</strong> (Business Profiles), and <strong>Instagram</strong>; many Manila spots post menus on Instagram as well as Google.<br><br>
+🔎 <strong>Discovery</strong> — research weights <strong>TikTok</strong>, <strong>Google Maps</strong> (Business Profiles), and <strong>Instagram</strong>. <strong>Always open the Maps or Grab link on each card before you leave your desk</strong> — that loads the <strong>live map engine</strong> (Google’s real-time routing, busy times, and whether the pin still matches your office) plus <strong>GrabFood’s live delivery radius & ETA</strong> to your tower, so you only commit once the map still meets your area, time, and dietary plan.<br><br>
 🥗 <strong>Dietary</strong> — tap halal, vegan, vegetarian, no pork, no beef, gluten-aware, or kosher (certified kosher dining is very limited — we’ll proxy thoughtfully). Categories we filter on include local Filipino, Chinese, fast food, American, pasta, and Korean.<br><br>
 ✨ <strong>Grab team go-tos</strong> — Lawson · Uncle John’s · Starbucks · Zeus — because they’re minutes from the office.`,
     hooks:[
@@ -1663,7 +1663,7 @@ const MENUS = {
 function getMenuLink(id) {
   const m = MENUS[id]; if (!m) return null;
   if (m.pdf)       return { url: m.pdf,       label: '📄 Menu (PDF)', title: 'Direct menu PDF' };
-  if (m.google)    return { url: m.google,     label: '🔍 Menu on Google', title: 'Opens Google Business — tap the Menu button' };
+  if (m.google)    return { url: m.google,     label: t('🔍 Live on Google Maps','🔍 Google Maps แบบเรียลไทม์'), title: t('Opens Google Maps — live routing, hours & busy times','เปิด Google Maps — เส้นทาง เวลาเปิด และความคึกคักแบบเรียลไทม์') };
   if (m.website)   return { url: m.website,    label: '📋 View Menu', title: 'Official website menu' };
   if (m.instagram) return { url: m.instagram,  label: '📸 Menu on Instagram', title: 'Browse posts for menu' };
   return null;
@@ -2164,7 +2164,7 @@ function buildGrabPanel(restaurants) {
   return `
     <div class="grab-delivery-box">
       <h3>${t('🛵 Grab Delivery Picks','🛵 แนะนำสำหรับเดลิเวอรี่')}</h3>
-      <p>${t(`These spots deliver to ${deliveryOffice}. Search them by name in the app for live ETAs and promo codes.`,`ร้านเหล่านี้ส่งมาที่ ${deliveryOffice} ค้นหาชื่อร้านในแอปเพื่อดูเวลาและโปรโมชั่น`)}</p>
+      <p>${t(`These spots are framed for ${deliveryOffice}. <strong>GrabFood’s in-app map is the live engine</strong> — search each name there for real-time delivery radius, ETA, and promos to your office pin.`,`ร้านเหล่านี้เหมาะกับ ${deliveryOffice} <strong>แผนที่ใน GrabFood คือระบบเรียลไทม์</strong> — ค้นหาชื่อร้านในแอปเพื่อดูวงส่ง ระยะเวลา และโปรที่พินหอออฟฟิศ`)}</p>
       <div style="margin:6px 0;display:flex;flex-wrap:wrap;gap:4px">
         <span class="promo-tag">💰 Check GrabFood promos</span>
         <span class="promo-tag">🏷️ PayLater discounts</span>
@@ -2762,7 +2762,7 @@ async function showGrabResults() {
   if (!res.length) {
     await botSay(t("I couldn't find a Grab match with those filters. Let me broaden — relaxing dietary filter slightly.","ไม่พบร้านที่ตรงกับเงื่อนไขของคุณ ลองขยายเงื่อนไขดูนะ"), 700);
   }
-  await botSay(t("Here are your best Grab delivery picks 🛵 Search these in the Grab app for live ETA and promos:","นี่คือตัวเลือกเดลิเวอรี่ที่ดีที่สุด 🛵 ค้นหาชื่อร้านในแอป Grab:"), 700);
+  await botSay(t("Here are your best Grab delivery picks 🛵 <strong>Search each name in GrabFood</strong> — the in-app map is the <strong>live engine</strong> for real-time ETA, promos, and whether that kitchen still delivers to your office pin with your dietary filters applied at checkout.","นี่คือตัวเลือกเดลิเวอรี่ที่ดีที่สุด 🛵 <strong>ค้นหาชื่อร้านใน GrabFood</strong> — แผนที่ในแอปคือ <strong>ระบบเรียลไทม์</strong> สำหรับ ETA โปร และว่ายังส่งถึงพินหอออฟฟิศคุณตามเงื่อนไขอาหารหรือไม่:"), 700);
   addCard(buildGrabPanel(res));
   await botSay(t("Open Grab Food, search by restaurant name, and check for any active promo codes under the checkout screen.","เปิด GrabFood ค้นหาชื่อร้าน แล้วเช็คโค้ดส่วนลดในหน้าชำระเงิน"), 800);
   await showFeedback();
@@ -2796,12 +2796,12 @@ async function showResults() {
   );
   const ratingNote = S.country === 'th' ? 'Google & Wongnai' : S.country === 'ph' ? 'Google Maps, TikTok & Instagram' : 'Google';
   const ratingLine = S.country === 'ph'
-    ? `Here are my top picks ${occLabel} — curated from <strong>${ratingNote}</strong> (most cards <strong>⭐ 4.0+</strong> on Google; we still surface trusted 3.5★ neighbourhood gems when they’re the best fit) ${isDinner?'🌙':'☀️'}`
-    : `Here are my top picks ${occLabel} — all <strong>⭐ 4.0+ rated on ${ratingNote}</strong> ${isDinner?'🌙':'☀️'}`;
-  await botSay(t(
-    ratingLine,
-    `นี่คือตัวเลือกที่ดีที่สุด${occLabel} — ทุกร้านได้ <strong>⭐ 4.0+ บน ${ratingNote}</strong> ${isDinner?'🌙':'☀️'}`
-  ), 700);
+    ? `Here are my top picks ${occLabel} — curated from <strong>${ratingNote}</strong> (most cards <strong>⭐ 4.0+</strong> on Google; we still surface trusted 3.5★ neighbourhood gems when they’re the best fit). <strong>Use “Live on Google Maps” or Grab on each card</strong> to open the <strong>live map layer</strong> — real-time distance, traffic, opening status, and GrabFood delivery reach to your office — and confirm everything still fits your filters before you head out. ${isDinner?'🌙':'☀️'}`
+    : `Here are my top picks ${occLabel} — all <strong>⭐ 4.0+ rated on ${ratingNote}</strong>. <strong>Open Google Maps or Grab from each card</strong> for the <strong>live map</strong> (routes, hours, delivery radius & ETA) so on-the-ground conditions still match what you asked for. ${isDinner?'🌙':'☀️'}`;
+  const ratingLineTH = S.country === 'ph'
+    ? `นี่คือตัวเลือกที่ดีที่สุด${occLabel} — คัดจาก <strong>${ratingNote}</strong> (ส่วนใหญ่ <strong>⭐ 4.0+</strong> บน Google; ยังมีร้านละแวกที่เชื่อถือได้แม้ ⭐ 3.5 เมื่อเหมาะที่สุด) <strong>แตะ “Google Maps แบบเรียลไทม์” หรือ Grab บนการ์ด</strong> เพื่อเปิด <strong>แผนที่แบบเรียลไทม์</strong> — ระยะทาง การจราจร เวลาเปิด-ปิด และวงเดลิเวอรี่/ETA ของ GrabFood ถึงออฟฟิศ — ยืนยันอีกครั้งก่อนออก ${isDinner?'🌙':'☀️'}`
+    : `นี่คือตัวเลือกที่ดีที่สุด${occLabel} — <strong>⭐ 4.0+ บน ${ratingNote}</strong> <strong>เปิด Google Maps หรือ Grab จากการ์ด</strong> เพื่อดู <strong>แผนที่เรียลไทม์</strong> (เส้นทาง เวลาเปิด วงเดลิเวอรี่ และ ETA) ให้ตรงกับที่คุณต้องการก่อนออก ${isDinner?'🌙':'☀️'}`;
+  await botSay(t(ratingLine, ratingLineTH), 700);
 
   const peakMsg = getPeak(S.mealType || null, S.country || null);
   if (peakMsg.level !== 'green') {
@@ -2939,7 +2939,7 @@ function resetChat() {
 }
 
 async function startChat() {
-  await botSay(`Hey! 👋 I shortlist restaurants using <strong>Google Maps</strong> (⭐ ratings & review volume) as the baseline, then layer in TikTok / Instagram buzz and local guides where we track them — all matched to each Grab office.<br><br>Which office are you at?`, 750);
+  await botSay(`Hey! 👋 I match you to an <strong>office-aware shortlist</strong> built from <strong>Google Maps</strong> ratings & reviews, TikTok / Instagram buzz, and local guides — filtered by what you tap (cuisine, dietary, budget, time, area).<br><br><strong>Each card hands off to the live map layer:</strong> open <strong>Google Maps</strong> or <strong>Grab / GrabFood</strong> from the buttons for <strong>real-time</strong> routing, busy times, opening hours, and whether delivery to your tower still sits inside the live service radius before you commit.<br><br>Which office are you at?`, 780);
   S.step = 'country';
   const tabsEl = document.createElement('div');
   tabsEl.className = 'city-tabs';
