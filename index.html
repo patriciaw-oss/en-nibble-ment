@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>En-Nibble-Ment</title>
+  <title>FoodFinder PJ</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -18,8 +18,7 @@
 
     /* ── Header ── */
     .hdr{background:linear-gradient(135deg,#00B14F 0%,#007a36 100%);padding:14px 18px;display:flex;align-items:center;gap:11px;flex-shrink:0}
-    .hdr-av{width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.18);background:#fff;display:flex;align-items:center;justify-content:center}
-    .hdr-av img{width:100%;height:100%;object-fit:cover;display:block}
+    .hdr-av{width:44px;height:44px;background:rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
     .hdr-info h1{color:#fff;font-size:15px;font-weight:700}
     .hdr-info p{color:rgba(255,255,255,.75);font-size:11px;margin-top:2px}
     .hdr-r{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
@@ -38,8 +37,7 @@
     .row{display:flex;align-items:flex-end;gap:7px;animation:fu .2s ease}
     .row.user{flex-direction:row-reverse}
     @keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    .bicon{width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.14);background:#fff;display:flex;align-items:center;justify-content:center}
-    .bicon img{width:100%;height:100%;object-fit:cover;display:block}
+    .bicon{width:27px;height:27px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
     .bub{max-width:80%;padding:10px 13px;border-radius:var(--r);font-size:13.5px;line-height:1.55;color:var(--text)}
     .bub.bot{background:var(--w);border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
     .bub.user{background:var(--g);color:#fff;border-bottom-right-radius:4px}
@@ -157,10 +155,10 @@
 <body>
 <div class="app">
   <div class="hdr">
-    <div class="hdr-av"><img id="botAvatar" src="img/ennibble-mascot.png" alt="En-Nibble-Ment mascot" onerror="this.parentElement.innerHTML='🍽️'"/></div>
+    <div class="hdr-av">🍽️</div>
     <div class="hdr-info">
-      <h1 style="font-size:16px;letter-spacing:-.2px">En-Nibble-Ment</h1>
-      <p style="font-size:10.5px;font-style:italic;color:rgba(255,255,255,.85)">You enable the sellers. We enable the stomach.</p>
+      <h1>FoodFinder PJ</h1>
+      <p>First Avenue · One Utama · KL Valley</p>
     </div>
     <div class="hdr-r">
       <div class="hbadge" id="hdrBadge">🇲🇾 Grab HQ</div>
@@ -2012,14 +2010,6 @@ function evaluatePick(r) {
 
   if (S.groupSize >= 9 && r.capacity === 'small') return { r, s: -1, hardFail: true, disclaimers, tier };
 
-  // Convenience stores are only appropriate for budget-rushed solo runs —
-  // hard-exclude them when the occasion is overseas-guests OR budget is mid+
-  const isConvenience = /convenience store|filipino convenience/i.test(r.cuisine);
-  if (isConvenience) {
-    if (S.occasion === 'overseas-guests') return { r, s: -1, hardFail: true, disclaimers, tier };
-    if (S.budget && S.budget !== 'low') return { r, s: -1, hardFail: true, disclaimers, tier };
-  }
-
   if (S.country === 'ph') {
     if (r.googleRating < 3.0) return { r, s: -1, hardFail: true, disclaimers, tier };
     if (r.googleRating >= 4.5) s += 10;
@@ -3017,4 +3007,3 @@ startChat();
 </script>
 </body>
 </html>
-
