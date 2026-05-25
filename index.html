@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FoodFinder PJ</title>
+  <title>En-Nibble-Ment</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -157,8 +157,8 @@
   <div class="hdr">
     <div class="hdr-av">🍽️</div>
     <div class="hdr-info">
-      <h1>FoodFinder PJ</h1>
-      <p>First Avenue · One Utama · KL Valley</p>
+      <h1>En-Nibble-Ment</h1>
+      <p>You enable the sellers. We enable the stomach</p>
     </div>
     <div class="hdr-r">
       <div class="hbadge" id="hdrBadge">🇲🇾 Grab HQ</div>
@@ -903,7 +903,7 @@ const DB_PH = [
    cuisine:'Convenience Store',walkMin:2,driveMin:null,priceRange:'₱50–180',priceNum:90,
    googleRating:4.1,reviews:'150+',vibe:'chill',capacity:'small',waitPeak:'fast',
    halal:false,veg:true,grab:true,
-   bestFor:['daily-lunch','team-outing','overseas-guests'],mealTypes:['lunch','dinner'],
+   bestFor:['daily-lunch','team-outing'],mealTypes:['lunch','dinner'],
    desc:'Japanese-style convenience — onigiri, sandwiches, hot snacks, drinks. Typical go-to when you only have 1–2 minutes from the office.',
    pt:'≈1–2 min walk from Exquadra Tower',deal:'GrabFood from nearby branch when you cannot step out',
    trending:['tiktok','instagram','google']},
@@ -2055,6 +2055,13 @@ function evaluatePick(r) {
 
   if (S.time === 'normal' && r.waitPeak === 'slow') s -= 4;
   if (S.time === 'relaxed') s += 2;
+
+  if (rCountry === 'ph' && /convenience/i.test(r.cuisine)) {
+    if (S.budget === 'high' || S.budget === 'splurge')
+      return { r, s: -1, hardFail: true, disclaimers, tier };
+    if (S.occasion === 'overseas-guests')
+      return { r, s: -1, hardFail: true, disclaimers, tier };
+  }
 
   const caps = S.mealType === 'dinner' ? cc.dinnerBudgetCaps : cc.budgetCaps;
   if (S.budget === 'low'    && r.priceNum > caps.low)    return { r, s: -1, hardFail: true, disclaimers, tier };
